@@ -6,16 +6,16 @@ created by ©︎niscode
 - dwa（障害物回避）と自己位置推定（amcl）を用いたナビゲーション などを実行するためのlaunchファイルが格納されます。
 <br>
 
-## [1/3] Ubuntu20.04 / ROS-noetic　環境を構築するための手順
+## [1/3] Ubuntu18.04 / ROS-melodic　環境を構築するための手順
 - `git clone git@github.com:niscode/scripts.git`
-- 上記のリポジトリをホームディレクトリに配置後、$ ./ros-noetic-setup.sh を実行。
+- 上記のリポジトリをホームディレクトリに配置後、$ ./ros-melodic-setup.sh を実行。
 - 手順通りに進めると　$ roscore できるようになります。
 <br>
 
-## [2/3] Ubuntu20.04 / ROS-noetic　環境で動作に必要なパッケージ群は以下の通りです。
-- `sudo apt -y install ros-noetic-rosserial`
-- `sudo apt -y install ros-noetic-slam-gmapping`
-- `sudo apt -y install ros-noetic-navigation`
+## [2/3] Ubuntu18.04 / ROS-melodic　環境で動作に必要なパッケージ群は以下の通りです。
+- `sudo apt -y install ros-melodic-rosserial`
+- `sudo apt -y install ros-melodic-slam-gmapping`
+- `sudo apt -y install ros-melodic-navigation`
 <br>
 - `cd catkin_ws/src`
 - `git clone https://github.com/niscode/telecoV.git`
