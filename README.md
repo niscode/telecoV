@@ -8,7 +8,8 @@ created by ©︎niscode
 
 ## [1/3] Ubuntu20.04 / ROS-noetic　環境を構築するための手順
 - `git clone git@github.com:niscode/scripts.git`
-- 上記のリポジトリをホームディレクトリに配置後、$ ./ros-noetic-setup.sh を起動し、手順通りに進めると　$ roscore できるようになる
+- 上記のリポジトリをホームディレクトリに配置後、$ ./ros-noetic-setup.sh を実行。
+- 手順通りに進めると　$ roscore できるようになります。
 <br>
 
 ## [2/3] Ubuntu20.04 / ROS-noetic　環境で動作に必要なパッケージ群は以下の通りです。
@@ -25,7 +26,7 @@ created by ©︎niscode
 - `catkin_make`
 <br>
 
-## [3/3] USB接続されたデバイスファイル名の固定するための手順
+## [3/3] USB接続されたデバイスファイル名の固定するための手順 （melodic/noetic共通）
 - `roscd telecoV/scripts`
 - `nano rplidar.rules`
 - 上記ファイルを編集して、対応するRPLiDARや台車のボードのシリアルNoを指定します。
