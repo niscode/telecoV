@@ -1,6 +1,8 @@
 # このパッケージの用途
 created by ©︎niscode
 
+## `git clone -b melodic git@github.com:niscode/telecoV.git`
+
 ここではTeleco-V（台車）を使って、
 - gmappingを用いたSLAM や、
 - dwa（障害物回避）と自己位置推定（amcl）を用いたナビゲーション などを実行するためのlaunchファイルが格納されます。
