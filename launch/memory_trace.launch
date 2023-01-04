@@ -1,0 +1,137 @@
+<?xml version="1.0"?>
+<!-- 
+  2023/01/04   nishimura
+  引用 https://sites.google.com/site/robotlabo/ros/%E7%A7%BB%E5%8B%95%E3%83%AD%E3%83%9C%E3%83%83%E3%83%88%E3%81%AE%E3%83%8A%E3%83%93%E3%82%B2%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3
+-->
+
+<launch>
+  <!-- roslaunch arguments -->
+  <arg name="show_rviz" default="true"/>
+  <arg name="paused" default="false"/>
+  <arg name="debug" default="false"/>
+  <arg name="gui" default="true"/>
+
+<!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+  <!-- <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="worlds/empty.world" />
+    <arg name="paused" value="$(arg paused)" />
+    <arg name="debug" value="$(arg debug)" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="use_sim_time" value="true" />
+    <arg name="headless" value="false" />
+  </include> -->
+
+
+  <!-- ROVERとの接続 -->
+  <node pkg="rosserial_python" name="serial_node" type="serial_node.py" output="screen">
+    <param name="port" value="/dev/ROVER_BOARD" />
+    <param name="baud" value="115200" />
+  </node>
+
+  <!-- オドメトリの配信ノード -->
+  <node pkg="telecoV" type="pub_odom" name="pub_odom" />
+
+  <node pkg="tf" type="static_transform_publisher" name="stp_laser01" args="0 0 0 0 0 0 base_link laser 100" />
+  <!-- 第2期teleco用 -->
+  <node pkg="tf" type="static_transform_publisher" name="stp_laser02" args="0.208 0 0.090 -4.72 0 0 base_link lrf_link_front 100" />
+  <node pkg="tf" type="static_transform_publisher" name="stp_laser03" args="-0.208 0 0.090 4.72 0 0 base_link lrf_link_rear 100"/>
+  <!-- 第1期teleco用 -->
+  <!-- <node pkg="tf" type="static_transform_publisher" name="stp_laser" args="0.208 0 0.090 -1.57 0 0 base_link lrf_link 1" />
+  <node pkg="tf" type="static_transform_publisher" name="stp_laser03" args="-0.208 0 0.090 1.57 0 0 base_link lrf_link_rear 100"/> -->
+
+  <!-- RPLiDAR 〔S2〕 デバイスドライバノード　x2-->
+  <node name="Front_LRF"          pkg="rplidar_ros"  type="rplidarNode" output="screen">
+    <param name="serial_port"         type="string" value="/dev/Front_LRF"/>
+    <param name="serial_baudrate"     type="int"    value="1000000"/>
+    <param name="frame_id"            type="string" value="lrf_link_front"/>
+    <!-- <param name="frame_id"            type="string" value="lrf_link"/> -->
+    <param name="inverted"            type="bool"   value="false"/>
+    <param name="angle_compensate"    type="bool"   value="true"/>
+    <param name="scan_mode"           type="string" value="Standard"/>
+    <remap from="scan" to="front_scan"/>
+  </node>
+
+  <node name="Rear_LRF"          pkg="rplidar_ros"  type="rplidarNode" output="screen">
+    <param name="serial_port"         type="string" value="/dev/Rear_LRF"/>
+    <param name="serial_baudrate"     type="int"    value="1000000"/>
+    <param name="frame_id"            type="string" value="lrf_link_rear"/>
+    <!-- <param name="frame_id"            type="string" value="lrf_link"/> -->
+    <param name="inverted"            type="bool"   value="false"/>
+    <param name="angle_compensate"    type="bool"   value="true"/>
+    <param name="scan_mode"           type="string" value="Standard"/>
+    <remap from="scan" to="rear_scan"/>
+  </node>
+
+  <!-- mapサーバー (マップファイルのパスの指定) -->
+  <arg name="map_file" default="$(find telecoV)/map/dualgmap_3f.yaml"/>
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+
+  <!-- laserscan multi_merger -->
+  <node pkg="ira_laser_tools" name="laserscan_multi_merger" type="laserscan_multi_merger">
+    <param name="destination_frame" value="laser"/>
+    <param name="scan_destination_topic" value="/scan"/>
+    <param name="laserscan_topics" value ="/front_scan /rear_scan" />
+  </node>
+
+  <!-- 自己位置推定ノード 〔amcl〕 -->
+  <node pkg="amcl" type="amcl" name="amcl" output="screen" args="/scan:=/scan">
+    <param name="gui_publish_rate" value="5.0"/>
+    <param name="odom_model_type" value="diff"/>
+    <param name="min_particles" value="500"/>
+    <param name="max_particles" value="2000"/>
+    <param name="kld_err" value="0.05"/>
+    <param name="kld_z" value="0.95"/>
+    <param name="odom_alpha1" value="7.0"/>
+    <param name="odom_alpha2" value="10.0"/>
+    <param name="odom_alpha3" value="7.0"/>
+    <param name="odom_alpha4" value="10.0"/>
+    <param name="laser_max_beams" value="60"/>
+    <param name="laser_z_hit" value="0.7"/>
+    <param name="laser_z_short" value="0.05"/>
+    <param name="laser_z_max" value="0.05"/>
+    <param name="laser_z_rand" value="0.3"/>
+    <param name="laser_sigma_hit" value="0.2"/>
+    <param name="laser_lambda_short" value="0.1"/>
+    <param name="laser_lambda_short" value="0.1"/>
+    <param name="laser_model_type" value="likelihood_field"/>
+    <param name="laser_likelihood_max_dist" value="2.0"/>
+    <param name="update_min_d" value="0.05"/>
+    <param name="update_min_a" value="0.03"/>
+    <param name="odom_frame_id" value="odom"/>
+    <param name="base_frame_id" value="base_link" />
+    <param name="resample_interval" value="1"/>
+    <param name="transform_tolerance" value="0.2"/>
+    <param name="recovery_alpha_slow" value="0.001"/>
+    <param name="recovery_alpha_fast" value="0.01"/>
+    <param name="use_map_topic" value="false" />
+  </node>
+ 
+  <!--- 経路計画，指令値生成ノード 〔move_base〕 -->
+  <arg name="cmd_vel_topic" default="cmd_vel" />
+  <arg name="odom_topic" default="odom" />
+
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" args="/cmd_vel:=/rover_twist">
+    <rosparam file="$(find telecoV)/params/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find telecoV)/params/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find telecoV)/params/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find telecoV)/params/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find telecoV)/params/dwa_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find telecoV)/params/move_base_params.yaml" command="load" />
+    <remap from="odom" to="$(arg odom_topic)"/>
+  </node>
+
+  <!-- Rviz -->
+  <!-- <node pkg="rviz" type="rviz" args="-d '$(find telecoV)/params/rviz/memory_trace.rviz'" name="visualizer" respawn="true" /> -->
+  <group if="$(arg show_rviz)">
+    <node pkg="rviz" type="rviz" output="screen" args="-d '$(find telecoV)/params/rviz/memory_trace.rviz'" name="visualizer" respawn="true"/> 
+    <!-- load joint controller configurations from YAML file to parameter server -->
+    <!-- <rosparam file="$(find wheel_robot_control)/config/joint_position_control.yaml" command="load" /> -->
+    <!-- load the controllers -->
+    <!-- <node name="wheel_robot_controller" pkg="controller_manager" type="spawner" output="screen" args="joint_state_controller" /> -->
+    <!-- publish all the frames to TF <Hz> -->
+    <!-- <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+      <param name="publish_frequency" value="50"/>
+    </node> -->
+  </group>
+
+</launch>

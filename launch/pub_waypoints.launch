@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!-- 
+  2023/01/04   nishimura
+  引用 https://sites.google.com/site/robotlabo/ros/%E7%A7%BB%E5%8B%95%E3%83%AD%E3%83%9C%E3%83%83%E3%83%88%E3%81%AE%E3%83%8A%E3%83%93%E3%82%B2%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3
+-->
+
+<launch>
+
+  <!-- waypointsの配信ノード -->
+  <arg name="waypoints_file" default="$(find telecoV)/waypoints/waypoints.yaml"/>
+  <node name="waitpoints_publish" pkg="waypoints_publish" type="waypoints_publish" output="screen">
+    <param name="filename" value="$(arg waypoints_file)" />
+  </node>
+
+</launch>

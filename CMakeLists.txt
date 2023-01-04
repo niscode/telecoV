@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
+# cmake_minimum_required(VERSION 2.8.3)
 project(telecoV)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
@@ -110,10 +111,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES telecoV
+  # INCLUDE_DIRS include
+  # LIBRARIES telecoV
    CATKIN_DEPENDS geometry_msgs nav_msgs roscpp rospy sensor_msgs std_msgs tf tf2 urdf xacro
-#  DEPENDS system_lib
+  DEPENDS system_lib
 )
 
 ###########
@@ -142,6 +143,12 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/telecoV_node.cpp)
 add_executable(telecoV_pub_odom src/pub_odom.cpp)
+add_executable(odom_listener src/odom_listener.cpp)
+
+target_link_libraries(odom_listener
+  ${catkin_LIBRARIES}
+)
+
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
