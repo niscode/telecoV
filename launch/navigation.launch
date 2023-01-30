@@ -30,7 +30,10 @@
     <group if="$(eval rover_type=='mega3')">
       <!-- メガローバーVer.3.0の場合 -->
       <!-- argsの項でLRFの位置を調整できます。 args="x y z y p r" 20220518追記 -->
-      <node pkg="tf" type="static_transform_publisher" name="stp_laser" args="0.208 0 0.090 -1.57 0 0 base_link lrf_link 1" />
+      <!-- 第2期teleco用 -->
+      <node pkg="tf" type="static_transform_publisher" name="stp_laser" args="0.208 0 0.090 -4.72 0 0 base_link lrf_link_front 100" />
+      <!-- 第1期teleco用 -->
+      <!-- <node pkg="tf" type="static_transform_publisher" name="stp_laser" args="0.208 0 0.090 -1.57 0 0 base_link lrf_link 1" /> -->
     </group>
     <group if="$(eval rover_type=='outdoor')">
       <!-- メガローバーVer.3.0屋外対応版の場合 -->
@@ -123,14 +126,14 @@
  
   <!--- 経路計画，指令値生成ノード　move_base -->
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" args="/cmd_vel:=/rover_twist">
-    <rosparam file="$(find telecoV)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find telecoV)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
-    <rosparam file="$(find telecoV)/config/local_costmap_params.yaml" command="load" />
-    <rosparam file="$(find telecoV)/config/global_costmap_params.yaml" command="load" />
-    <rosparam file="$(find telecoV)/config/dwa_local_planner_params.yaml" command="load" />
-    <rosparam file="$(find telecoV)/config/move_base_params.yaml" command="load" />
+    <rosparam file="$(find telecoV)/params/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find telecoV)//costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find telecoV)/params/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find telecoV)/params/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find telecoV)/params/dwa_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find telecoV)/params/move_base_params.yaml" command="load" />
   </node>
 
   <!-- Rviz -->
-  <node pkg="rviz" type="rviz" args="-d '$(find telecoV)/config/rviz/navigation.rviz'" name="visualizer" respawn="true" />
+  <node pkg="rviz" type="rviz" args="-d '$(find telecoV)/params/rviz/navigation.rviz'" name="visualizer" respawn="true" />
 </launch>

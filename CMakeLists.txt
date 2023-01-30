@@ -19,6 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf2
   urdf
   xacro
+  rviz
 )
 
 ## System dependencies are found with CMake's conventions
@@ -29,6 +30,15 @@ find_package(catkin REQUIRED COMPONENTS
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
 # catkin_python_setup()
+
+# 2023/01/10 for Control Panel
+set(CMAKE_AUTOMOC ON)
+find_package(Qt5 ${rviz_QT_VERSION} EXACT REQUIRED
+  Core
+  Widgets
+)
+set(QT_LIBRARIES Qt5::Widgets)
+add_definitions(-DQT_NO_KEYWORDS)
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -132,6 +142,10 @@ include_directories(
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/telecoV.cpp
 # )
+add_library(${PROJECT_NAME}
+  src/qt_twist_panel.cpp
+  src/qt_touch.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -144,10 +158,8 @@ include_directories(
 # add_executable(${PROJECT_NAME}_node src/telecoV_node.cpp)
 add_executable(telecoV_pub_odom src/pub_odom.cpp)
 add_executable(odom_listener src/odom_listener.cpp)
-
-target_link_libraries(odom_listener
-  ${catkin_LIBRARIES}
-)
+add_executable(pub_info src/pub_info.cpp)
+add_executable(pub_fusion src/pub_fusion.cpp)
 
 
 ## Rename C++ executable without prefix
@@ -164,7 +176,25 @@ target_link_libraries(odom_listener
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
+
+target_link_libraries(${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+  ${QT_LIBRARIES}
+)
+
 target_link_libraries(telecoV_pub_odom
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(odom_listener
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(pub_info
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(pub_fusion
   ${catkin_LIBRARIES}
 )
 

@@ -87,5 +87,5 @@
 
 
   <!-- rviz(視覚化ツール) -->
-  <node pkg="rviz" type="rviz" args="-d '$(find telecoV)/config/rviz/gmapping.rviz'" name="visualizer" respawn="true" />
+  <node pkg="rviz" type="rviz" args="-d '$(find telecoV)/params/rviz/gmapping.rviz'" name="visualizer" respawn="true" />
 </launch>

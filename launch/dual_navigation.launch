@@ -131,6 +131,7 @@
   </node>
 
   <!-- Rviz -->
-  <node pkg="rviz" type="rviz" args="-d '$(find telecoV)/config/rviz/navigation.rviz'" name="visualizer" respawn="true" />
-
+  <arg name="rvizconfig" default="$(find telecoV)/params/rviz/navigation.rviz" />
+  <node pkg="telecoV" type="pub_info" name="pub_info" />
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rvizconfig)" required="true" />
 </launch>

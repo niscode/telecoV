@@ -6,26 +6,30 @@
 # telecoV002
 #KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="d85a1297c713ec11b546f0ef7a109228", MODE:="0777", SYMLINK+="Front_LRF"
 # telecoV003
-#KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="ead3a41fb313ec11afe7f4ef7a109228", MODE:="0777", SYMLINK+="Front_LRF"
+KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="ead3a41fb313ec11afe7f4ef7a109228", MODE:="0777", SYMLINK+="Front_LRF"
 # telecoV004
-KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="f4a2be83bb13ec119882f2ef7a109228", MODE:="0777", SYMLINK+="Front_LRF"
+#KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="f4a2be83bb13ec119882f2ef7a109228", MODE:="0777", SYMLINK+="Front_LRF"
 
 # cp2102 Rear  (rplider s2)
 # telecoV002
 #KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="1cdbf0fc3713ec118cd1f4ef7a109228", MODE:="0777", SYMLINK+="Rear_LRF"
 # telecoV003
-#KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="9acf8825af13ec1196abfbef7a109228", MODE:="0777", SYMLINK+="Rear_LRF"
+KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="9acf8825af13ec1196abfbef7a109228", MODE:="0777", SYMLINK+="Rear_LRF"
 # telecoV004
-KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="5c0596993113ec119e6bfbef7a109228", MODE:="0777", SYMLINK+="Rear_LRF"
+#KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="5c0596993113ec119e6bfbef7a109228", MODE:="0777", SYMLINK+="Rear_LRF"
 
 # FT231X
+KERNEL=="ttyUSB*", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6015", MODE:="0666", SYMLINK+="ROVER_BOARD"
 # telecoV002
-#KERNEL=="ttyUSB*", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6015", ATTRS{serial}=="DP04C6HW", MODE:="0666", SYMLINK+="ROVER_BOARD"
+    # ATTRS{serial}=="DP04C6HW"
 # telecoV003
-#KERNEL=="ttyUSB*", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6015", ATTRS{serial}=="DP04C6HX", MODE:="0666", SYMLINK+="ROVER_BOARD"
+    # ATTRS{serial}=="DP04C6HX"
 # telecoV004
-KERNEL=="ttyUSB*", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6015", ATTRS{serial}=="D200CT3I", MODE:="0666", SYMLINK+="ROVER_BOARD"
+    #ATTRS{serial}=="D200CT3I"
 
 
 # ReSpeaker
 SUBSYSTEM=="usb", ATTR{idVendor}=="2886", ATTR{idProduct}=="0018", MODE="0666", GROUP="plugdev"
+
+# IMU RT-USB-9AXIS-00
+KERNEL=="ttyACM*", ATTRS{idVendor}=="2b72", ATTRS{idProduct}=="0003", ATTRS{serial}=="9AXIS-00", MODE:="0666", SYMLINK+="ROVER_IMU"

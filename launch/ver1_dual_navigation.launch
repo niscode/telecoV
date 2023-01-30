@@ -128,6 +128,6 @@
   </node>
 
   <!-- Rviz -->
-  <node pkg="rviz" type="rviz" args="-d '$(find telecoV)/config/rviz/navigation.rviz'" name="visualizer" respawn="true" />
+  <node pkg="rviz" type="rviz" args="-d '$(find telecoV)/params/rviz/navigation.rviz'" name="visualizer" respawn="true" />
 
 </launch>

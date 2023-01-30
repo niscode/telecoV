@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  IMU統合版 SLAM（gmapping）のlaunch
+  2023-01-04   nishimura
+  引用1  https://qiita.com/srs/items/7e8454d4d616983e5cb8
+  引用2  https://github.com/rt-net/raspimouse_ros_examples/blob/master/scripts/direction_control.py
+-->
+
+<launch>
+<!-- ROVERとの接続 -->
+  <node pkg="rosserial_python" name="serial_node" type="serial_node.py" output="screen">
+    <param name="port" value="/dev/ROVER_BOARD" />
+    <param name="baud" value="115200" />
+  </node>
+
+<!-- tf::オドメトリの配信ノード -->
+  <node pkg="telecoV" type="pub_odom" name="pub_odom" />
+<!-- tf2_ros::オドメトリの配信ノード -->
+  <!-- <node pkg="telecoV" type="pub_odom" name="pub_odom_tf2" /> -->
+
+<!-- オドメトリ - IMU 統合情報の配信ノード (combined_odom) -->
+  <!-- <node pkg="telecoV" type="pub_fusion" name="pub_fusion" /> -->
+
+
+<!-- RPLiDARデバイスドライバノード -->
+  <node name="Front_LRF"          pkg="rplidar_ros"  type="rplidarNode" output="screen">
+    <param name="serial_port"         type="string" value="/dev/Front_LRF"/>
+    <param name="serial_baudrate"     type="int"    value="1000000"/>
+    <param name="frame_id"            type="string" value="lrf_link_front"/>
+    <param name="inverted"            type="bool"   value="false"/>
+    <param name="angle_compensate"    type="bool"   value="true"/>
+    <param name="scan_mode"           type="string" value="Standard"/>
+    <remap from="scan" to="front_scan"/>
+  </node>
+
+  <node name="Rear_LRF"          pkg="rplidar_ros"  type="rplidarNode" output="screen">
+    <param name="serial_port"         type="string" value="/dev/Rear_LRF"/>
+    <param name="serial_baudrate"     type="int"    value="1000000"/>
+    <param name="frame_id"            type="string" value="lrf_link_rear"/>
+    <param name="inverted"            type="bool"   value="false"/>
+    <param name="angle_compensate"    type="bool"   value="true"/>
+    <param name="scan_mode"           type="string" value="Standard"/>
+    <remap from="scan" to="rear_scan"/>
+  </node>
+
+<!-- tf::base_link 〔roverの座標原点〕 から見たLRFの位置(座標原点)を調整する args="x y z y p r parent_node child_node period_in_ms[100ms -> 10hz]" 2022-08-17追記 -->
+  <node pkg="tf" type="static_transform_publisher" name="stp_laser01" args="0 0 0 0 0 0 base_link laser 10" />
+  <node pkg="tf" type="static_transform_publisher" name="stp_laser02" args="0.208 0 0.090 1.5708 0 0 base_link lrf_link_front 10" />
+  <node pkg="tf" type="static_transform_publisher" name="stp_laser03" args="-0.208 0 0.090 -1.5708 0 0 base_link lrf_link_rear 10" />
+
+<!-- tf2_ros::base_linkから見たLRFの位置 pub_odom_tf2.cpp -->
+  <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="stp_laser01" args="0 0 0 0 0 0 base_link laser 100" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="stp_laser02" args="0.208 0 0.090 -4.72 0 0 base_link lrf_link_front 100" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="stp_laser03" args="-0.208 0 0.090 4.72 0 0 base_link lrf_link_rear 100"/> -->
+
+
+<!--  9軸IMUセンサモジュールドライバノード  -->
+  <arg name="port" default="/dev/ROVER_IMU" />
+  <arg name="frame_id" default="imu_link" />
+  <node pkg="rt_usb_9axisimu_driver" type="rt_usb_9axisimu_driver" name="pub_imu" required="true" output="screen">
+    <param name="port" value="$(arg port)" />
+    <param name="frame_id" value="$(arg frame_id)" />
+  </node>
+
+<!-- tf::base_link 〔roverの座標原点〕 から見たIMUの位置(座標原点)を調整する 2023-01-05追記 -->
+  <node pkg="tf" type="static_transform_publisher" name="stp_imu" args="0 0.070 0.270 1.5708 0 0 base_link imu_link 10" />
+
+
+<!-- laserscan multi_merger -->
+  <node pkg="ira_laser_tools" name="laserscan_multi_merger" type="laserscan_multi_merger">
+    <param name="destination_frame" value="laser"/>
+    <param name="scan_destination_topic" value="/scan"/>
+    <param name="laserscan_topics" value ="/front_scan /rear_scan" />
+  </node>
+
+
+<!--  EKF::robot localization -->
+  <!-- <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true" output="screen">
+    <rosparam command="load" file="$(find telecoV)/params/ekf_localization/odom_imu.yaml" />
+    <remap from="odometry/filtered" to="fusion/odom" />
+    <remap from="odom0" to="odom" />
+    <remap from="imu0"  to="imu/data_raw" />
+  </node> -->
+
+
+<!-- gmapping -->
+  <node pkg="gmapping" type="slam_gmapping" name="mapper">
+    <param name="base_frame" value="base_link"/>  <!-- ロボットの基本フレーム -->
+    <param name="odom_frame" value="odom"/>  <!-- オドメトリフレーム (default: odom) -->
+    <param name="maxUrange" value="20.0" type="double" />  <!-- 使用するレーザ計測の最大範囲 <m> -->
+    <param name="delta" value="0.05" />  <!-- 地図の解像度：距離 / ピクセル -->
+    <param name="xmax" value="30" type="double" />  <!-- 初期地図サイズ (最大x) -->
+    <param name="ymax" value="30" type="double" />  <!-- 初期地図サイズ (最大y) -->
+    <param name="xmin" value="-30" type="double" />  <!-- 初期地図サイズ (最小x) -->
+    <param name="ymin" value="-30" type="double" />  <!-- 初期地図サイズ (最小y) -->
+  </node>
+    <!-- 
+    <param name="map_update_interval" value="5.0"/>  地図更新の時間間隔 <sec>
+    <param name="linearUpdate" value="0.2"/>  処理に必要な最低移動距離 <m?>
+    <param name="angularUpdate" value="0.2"/>  処理に必要な最低回転角度 <rad?>
+    <param name="temporalUpdate" value="0.5"/>  最後にスキャンした時間が更新時間を超えた場合、スキャンを行う <sec?>
+    -->
+
+<!-- move_base -->
+  <!-- <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" args="/cmd_vel:=/rover_twist">
+    <rosparam file="$(find telecoV)/params/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find telecoV)/params/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find telecoV)/params/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find telecoV)/params/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find telecoV)/params/dwa_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find telecoV)/params/move_base_params.yaml" command="load" />
+  </node> -->
+
+
+<!-- rviz(視覚化ツール) -->
+  <arg name="rvizconfig" default="$(find telecoV)/params/rviz/imu_gmapping.rviz" />
+  <node pkg="telecoV" type="pub_info" name="pub_info" />
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rvizconfig)" required="true" />
+
+</launch>
