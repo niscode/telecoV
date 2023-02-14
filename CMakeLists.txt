@@ -156,7 +156,8 @@ add_library(${PROJECT_NAME}
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/telecoV_node.cpp)
-add_executable(telecoV_pub_odom src/pub_odom.cpp)
+# add_executable(telecoV_pub_odom src/pub_odom.cpp)
+add_executable(pub_odom src/pub_odom.cpp)
 add_executable(odom_listener src/odom_listener.cpp)
 add_executable(pub_info src/pub_info.cpp)
 add_executable(pub_fusion src/pub_fusion.cpp)
@@ -182,7 +183,11 @@ target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
 )
 
-target_link_libraries(telecoV_pub_odom
+#target_link_libraries(telecoV_pub_odom
+#  ${catkin_LIBRARIES}
+#)
+
+target_link_libraries(pub_odom
   ${catkin_LIBRARIES}
 )
 
@@ -198,10 +203,13 @@ target_link_libraries(pub_fusion
   ${catkin_LIBRARIES}
 )
 
-set_target_properties(telecoV_pub_odom
+#set_target_properties(telecoV_pub_odom
+#                      PROPERTIES OUTPUT_NAME pub_odom
+#                      PREFIX "")
+
+set_target_properties(pub_odom
                       PROPERTIES OUTPUT_NAME pub_odom
                       PREFIX "")
-
 
 #############
 ## Install ##
@@ -252,13 +260,13 @@ install(DIRECTORY params
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
-install(DIRECTORY meshes
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+#install(DIRECTORY meshes
+#  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+#)
 
-install(DIRECTORY robots
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+#install(DIRECTORY robots
+#  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+#)
 
 install(DIRECTORY urdf
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}

@@ -70,7 +70,7 @@
 
   <!-- mapサーバー -->
   <!--以下でマップファイルのパスの指定 -->
-  <arg name="map_file" default="$(find telecoV)/map/dualgmap_3f.yaml"/>
+  <arg name="map_file" default="$(find telecoV)/map/gmap_suidobashi.yaml"/>
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
 
   <!-- laserscan multi_merger -->
