@@ -1,5 +1,6 @@
 # global costmap params for telecoV MEGAROVER
 # 2022年11月15日 ros-melodic版からコピー
+# （AIST） https://robo-marc.github.io/navigation_documents/costmap_2d.html#costmap2d-inflation
 
 global_costmap:
   plugins:

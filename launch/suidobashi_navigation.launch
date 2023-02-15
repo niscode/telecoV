@@ -73,11 +73,17 @@
   <arg name="map_file" default="$(find telecoV)/map/gmap_suidobashi.yaml"/>
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
 
-  <!-- laserscan multi_merger -->
-  <node pkg="ira_laser_tools" name="laserscan_multi_merger" type="laserscan_multi_merger">
+  <!-- laserscan multi_merger を5秒間のディレイを設けて開始 -->
+  <arg name="node_start_delay" default="5.0" />
+  <node pkg="ira_laser_tools" name="laserscan_multi_merger" type="laserscan_multi_merger" output="screen" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' ">
     <param name="destination_frame" value="laser"/>
     <param name="scan_destination_topic" value="/scan"/>
     <param name="laserscan_topics" value ="/front_scan /rear_scan" />
+    
+    <param name="angle_min" value="-3.14"/>
+    <param name="angle_max" value="3.14"/>
+    <param name="range_min" value="0.30"/>
+    <param name="range_max" value="25.0"/>
   </node>
 
   <!-- 
@@ -133,6 +139,7 @@
   <!-- Rviz -->
   <arg name="rvizconfig" default="$(find telecoV)/params/rviz/navigation.rviz" />
   <node pkg="telecoV" type="pub_info" name="pub_info" />
-  <node pkg="telecoV" type="multigoal_marker.py" name="multigoal_marker" />
+  <node pkg="telecoV" type="multigoal_marker_suidobashi.py" name="multigoal_marker" />
   <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rvizconfig)" required="true" />
+
 </launch>
