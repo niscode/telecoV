@@ -74,11 +74,17 @@ created by ©︎niscode
   <arg name="map_file" default="$(find telecoV)/map/dualgmap_3f.yaml"/>
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
 
-  <!-- laserscan multi_merger -->
-  <node pkg="ira_laser_tools" name="laserscan_multi_merger" type="laserscan_multi_merger">
+  <!-- laserscan multi_merger を5秒間のディレイを設けて開始 -->
+  <arg name="node_start_delay" default="5.0" />
+  <node pkg="ira_laser_tools" name="laserscan_multi_merger" type="laserscan_multi_merger" output="screen" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' ">
     <param name="destination_frame" value="laser"/>
     <param name="scan_destination_topic" value="/scan"/>
     <param name="laserscan_topics" value ="/front_scan /rear_scan" />
+    
+    <param name="angle_min" value="-3.14"/>
+    <param name="angle_max" value="3.14"/>
+    <param name="range_min" value="0.30"/>
+    <param name="range_max" value="25.0"/>
   </node>
 
   <!-- 
