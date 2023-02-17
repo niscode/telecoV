@@ -1,13 +1,32 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import rospy
 import csv
+from geometry_msgs.msg import PoseWithCovarianceStamped
 from visualization_msgs.msg import Marker
 from move_base_msgs.msg import MoveBaseActionGoal, MoveBaseGoal
+
+# 初期位置
+initPose = [(-2.658176898956299,-1.5030968189239502,0.0),(0.0,0.0,0.6529810901764967,0.7573742112535348)]
 
 # 変数 [waypoints] にmulitgoal_getter.pyで取得したリストを格納
 waypoints = [
 
 ]
+
+def init_pose(pose): 
+    pub_pose = rospy.Publisher('initialpose', PoseWithCovarianceStamped, queue_size=10)
+
+    initial_pose = PoseWithCovarianceStamped()
+    initial_pose.header.stamp=rospy.Time.now()
+    initial_pose.header.frame_id="map"
+    initial_pose.pose.pose.position.x = pose[0][0]
+    initial_pose.pose.pose.position.y = pose[0][1]
+    initial_pose.pose.pose.orientation.z = pose[1][2]
+    initial_pose.pose.pose.orientation.w = pose[1][3]
+
+    pub_pose.publish(initial_pose)
+    # rospy.loginfo(initial_pose)
+
 
 def goal_pose(pose): 
     goal_pose = MoveBaseGoal()
@@ -26,10 +45,17 @@ def goal_pose(pose):
 rospy.init_node("multigoal_marker")
 pub = rospy.Publisher("waypoint", Marker, queue_size = 10)
 rospy.Subscriber("/move_base/goal", MoveBaseActionGoal, goal_pose)
-rate = rospy.Rate(25)
+rate = rospy.Rate(1)
 
 
 if __name__ == '__main__':
+    if not rospy.is_shutdown():
+        for i in range(2):
+            init_pose(initPose)
+            rospy.sleep(0.3)
+        rospy.loginfo('Initialize position!')
+        rospy.loginfo('Display Marker and Number!')
+
     while not rospy.is_shutdown():
         counter = 0
         for i, pose in enumerate(waypoints):
