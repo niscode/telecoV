@@ -42,4 +42,4 @@ created by ©︎niscode
 - `roslaunch telecoV dual_naivation.launch`
 <br><br>
 
-<span style="font-size: 200%; color: red;">20230217 - melodic更新を一時停止</span>
+### 20230217 - melodic更新を一時停止
