@@ -123,7 +123,7 @@ add_definitions(-DQT_NO_KEYWORDS)
 catkin_package(
   # INCLUDE_DIRS include
   # LIBRARIES telecoV
-   CATKIN_DEPENDS geometry_msgs nav_msgs roscpp rospy sensor_msgs std_msgs tf tf2 urdf xacro
+  CATKIN_DEPENDS geometry_msgs nav_msgs roscpp rospy sensor_msgs std_msgs tf tf2 urdf xacro
   DEPENDS system_lib
 )
 
