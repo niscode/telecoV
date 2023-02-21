@@ -41,7 +41,7 @@ created by ©︎niscode
 ### navigationによる自律移動は以下のように実行します。
 - `roslaunch telecoV dual_naivation.launch`
 
-### cylinderを上下に昇降させるためのスライダを表示するは以下を実行します。
+### cylinder昇降用スライダを表示するには以下を実行します。
 - `rosrun telecoV cylinder.py`
 <br>![シリンダー上下用のスライダー](img/slider.png)
 - スライダーを上下に動かし、任意の位置で Update ボタンを押すことで動作します。
