@@ -40,3 +40,10 @@ created by ©︎niscode
 - `roslaunch telecoV dual_gmapping.launch`
 ### navigationによる自律移動は以下のように実行します。
 - `roslaunch telecoV dual_naivation.launch`
+
+### cylinderを上下に昇降させるためのスライダを表示するは以下を実行します。
+- `rosrun telecoV cylinder.py`
+<br>![シリンダー上下用のスライダー](img/slider.png)
+- スライダーを上下に動かし、任意の位置で Update ボタンを押すことで動作します。
+- ※ `rosrun rosserial_python serial_node.py _port:=/dev/ROVER_BOARD _baud:=115200` が実行中か、
+    navigationなどのパッケージ実行中のみ、昇降が可能です。
