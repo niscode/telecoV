@@ -55,7 +55,7 @@ if __name__ == '__main__':
     if not rospy.is_shutdown():
         for i in range(2):
             init_pose(initPose)
-            rospy.sleep(0.25)
+            rospy.sleep(1)
         rospy.loginfo('Initialize position!')
         rospy.loginfo('Display Marker and Number!')
 

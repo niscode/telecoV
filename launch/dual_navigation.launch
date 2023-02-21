@@ -137,5 +137,6 @@
   <arg name="rvizconfig" default="$(find telecoV)/params/rviz/navigation.rviz" />
   <node pkg="telecoV" type="pub_info" name="pub_info" />
   <node pkg="telecoV" type="multigoal_marker.py" name="multigoal_marker" />
+  <node pkg="robot_pose_publisher" type="robot_pose_publisher" name="robot_pose_publisher" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' "/>
   <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rvizconfig)" required="true" />
 </launch>
