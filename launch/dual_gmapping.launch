@@ -90,5 +90,6 @@ created by ©︎niscode
 
   <!-- rviz(視覚化ツール) -->
   <node pkg="rviz" type="rviz" args="-d '$(find telecoV)/params/rviz/gmapping.rviz'" name="visualizer" respawn="true" />
-
+  <node pkg="telecoV" type="pub_info" name="pub_info" />
+  
 </launch>

@@ -47,7 +47,7 @@ def goal_pose(pose):
 
 rospy.init_node("multigoal_marker")
 pub = rospy.Publisher("waypoint", Marker, queue_size = 10)
-rospy.Subscriber("/move_base/goal", MoveBaseActionGoal, goal_pose)
+# rospy.Subscriber("/move_base/goal", MoveBaseActionGoal, goal_pose)    # 不要
 rate = rospy.Rate(1)
 
 

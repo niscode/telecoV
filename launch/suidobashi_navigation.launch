@@ -13,15 +13,20 @@
   <arg name="rover_type"  default="mega3"  doc="mega3 / outdoor" />
   <arg name="lrf"         default="s2"  doc="s2"/>
 
+  <!-- mapサーバー -->
+  <!--以下でマップファイルのパスの指定 -->
+  <!-- <arg name="map_file" default="$(find telecoV)/map/dualgmap_3f.yaml"/> -->
+  <arg name="map_file" default="$(find telecoV)/map/gmap_suidobashi9f.yaml"/>
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+
   <!-- ROVERとの接続 -->
   <node pkg="rosserial_python" name="serial_node" type="serial_node.py" output="screen">
     <param name="port" value="/dev/ROVER_BOARD" />
     <param name="baud" value="115200" />
   </node>
-
+  
   <!-- オドメトリの配信ノード -->
-  <node pkg="telecoV" type="pub_odom" name="pub_odom" />
-
+  <node pkg="telecoV" type="pub_odom" name="pub_odom" /> 
 
   <!-- RPLidar【s2】場合 20220516追記 -->
   <group if="$(eval lrf=='s2')">
@@ -67,13 +72,6 @@
     </node>
   </group>
 
-
-  <!-- mapサーバー -->
-  <!--以下でマップファイルのパスの指定 -->
-  <!-- <arg name="map_file" default="$(find telecoV)/map/dualgmap_3f.yaml"/> -->
-  <arg name="map_file" default="$(find telecoV)/map/gmap_suidobashi.yaml"/>
-  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
-
   <!-- laserscan multi_merger を5秒間のディレイを設けて開始 -->
   <arg name="node_start_delay" default="5.0" />
   <node pkg="ira_laser_tools" name="laserscan_multi_merger" type="laserscan_multi_merger" output="screen" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' ">
@@ -83,7 +81,7 @@
     
     <param name="angle_min" value="-3.14"/>
     <param name="angle_max" value="3.14"/>
-    <param name="range_min" value="0.30"/>
+    <param name="range_min" value="0.56"/>
     <param name="range_max" value="25.0"/>
   </node>
 
@@ -141,6 +139,7 @@
   <arg name="rvizconfig" default="$(find telecoV)/params/rviz/navigation.rviz" />
   <node pkg="telecoV" type="pub_info" name="pub_info" />
   <node pkg="telecoV" type="multigoal_marker_suidobashi.py" name="multigoal_marker" />
+  <node pkg="robot_pose_publisher" type="robot_pose_publisher" name="robot_pose_publisher" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' "/>
   <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rvizconfig)" required="true" />
 
 </launch>

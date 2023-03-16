@@ -5,13 +5,32 @@ from geometry_msgs.msg import PoseWithCovarianceStamped
 from visualization_msgs.msg import Marker
 from move_base_msgs.msg import MoveBaseActionGoal, MoveBaseGoal
 
-# 初期位置
-initPose = [(-2.658176898956299,-1.5030968189239502,0.0),(0.0,0.0,0.6529810901764967,0.7573742112535348)]
+# 初期位置：縦長mapの時
+# initPose = [(0.6584372520446777,-1.261426329612732,0.0),(0.0,0.0,-0.028043979405168205,0.9996066902632867)]
 
+# 横長mapのとき
+initPose = [(-0.591,-0.409,0.0),(0.0,0.0,2.106,0.9996066902632867)]
+
+# 横長mapを4°反時計回りに回したとき
+# initPose = [(-3.246, 1.288, 0.0),(0.0,0.0,1.713,0.9996066902632867)]
+
+ 
 # 変数 [waypoints] にmulitgoal_getter.pyで取得したリストを格納
 waypoints = [
-
+    [(-0.591,-0.409,0.0),(0.0,0.0,2.106,0.993)],
+    [(0.627,1.091,0.0),(0.0,0.0,2.981,0.992)],
+    [(0.253,3.452,0.0),(0.0,0.0,-2.775,0.991)],
+    [(-6.054,3.977,0.0),(0.0,0.0,0.930,0.988)],
+    [(-6.911,6.666,0.0),(0.0,0.0,1.081,0.987)],
 ]
+
+# waypoints = [
+#     [(0.6584372520446777,-1.261426329612732,0.0),(0.0,0.0,-0.028043979405168205,0.9996066902632867)],
+#     [(3.5962040424346924,-1.3393248319625854,0.0),(0.0,0.0,0.3582497924904278,0.9336257741625203)],
+#     [(3.500,1.347,0.0),(0.0,0.0,1.516,0.8584789450836453)],
+#     [(3.7195353507995605,5.172179698944092,0.0),(0.0,0.0,0.1582497924904278,0.5502707555513423)],
+#     [(6.455223560333252,6.638523101806641,0.0),(0.0,0.0,-0.4278117169861944,0.9038678746417113)],
+# ]
 
 def init_pose(pose): 
     pub_pose = rospy.Publisher('initialpose', PoseWithCovarianceStamped, queue_size=10)
@@ -44,7 +63,7 @@ def goal_pose(pose):
 
 rospy.init_node("multigoal_marker")
 pub = rospy.Publisher("waypoint", Marker, queue_size = 10)
-rospy.Subscriber("/move_base/goal", MoveBaseActionGoal, goal_pose)
+# rospy.Subscriber("/move_base/goal", MoveBaseActionGoal, goal_pose)
 rate = rospy.Rate(1)
 
 
