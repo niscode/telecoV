@@ -1,18 +1,15 @@
 <?xml version="1.0"?>
-<!-- 
-  USE STATIC MAP
-
-  起動コマンド： roslaunch telecoV navigation.launch
+<!--
+  起動コマンド： roslaunch telecoV dual_navigation.launch
 
   created by ©︎niscode
   2022年11月15日 ros-melodic版からコピー
 -->
 
 <launch>
-
   <!-- 引数 -->
   <arg name="rover_type"  default="mega3"  doc="mega3 / outdoor" />
-  <arg name="lrf"         default="s2"  doc="s2 / a3"/>
+  <arg name="lrf"         default="s2"  doc="s2"/>
 
   <!-- ROVERとの接続 -->
   <node pkg="rosserial_python" name="serial_node" type="serial_node.py" output="screen">
@@ -24,16 +21,20 @@
   <node pkg="telecoV" type="pub_odom" name="pub_odom" />
 
 
-  <!-- RPLidar【a3】の場合 20220516追記 -->
-  <group if="$(eval lrf=='a3')">
+  <!-- RPLidar【s2】場合 20220516追記 -->
+  <group if="$(eval lrf=='s2')">
     <!-- メガローバーの旋回中心からLRFまでの座標変換の設定 -->
     <group if="$(eval rover_type=='mega3')">
       <!-- メガローバーVer.3.0の場合 -->
-      <!-- argsの項でLRFの位置を調整できます。 args="x y z y p r" 20220518追記 -->
+      <!-- base_linkから見たLRFの位置を調整する args="x y z y p r parent_node child_node period_in_ms" 20220817追記 -->
+      <node pkg="tf" type="static_transform_publisher" name="stp_laser01" args="0 0 0 0 0 0 base_link laser 100" />
       <!-- 第2期teleco用 -->
-      <node pkg="tf" type="static_transform_publisher" name="stp_laser" args="0.208 0 0.090 -4.72 0 0 base_link lrf_link_front 100" />
+      <node pkg="tf" type="static_transform_publisher" name="stp_laser02" args="0.208 0 0.090 -4.72 0 0 base_link lrf_link_front 100" />
+      <node pkg="tf" type="static_transform_publisher" name="stp_laser03" args="-0.208 0 0.090 4.72 0 0 base_link lrf_link_rear 100"/>
       <!-- 第1期teleco用 -->
-      <!-- <node pkg="tf" type="static_transform_publisher" name="stp_laser" args="0.208 0 0.090 -1.57 0 0 base_link lrf_link 1" /> -->
+      <!-- <node pkg="tf" type="static_transform_publisher" name="stp_laser02" args="0.208 0 0.090 -1.57 0 0 base_link lrf_link_front 100" />
+      <node pkg="tf" type="static_transform_publisher" name="stp_laser03" args="-0.208 0 0.090 1.57 0 0 base_link lrf_link_rear 100"/> -->
+
     </group>
     <group if="$(eval rover_type=='outdoor')">
       <!-- メガローバーVer.3.0屋外対応版の場合 -->
@@ -41,49 +42,47 @@
     </group>
 
     <!-- RPLiDARデバイスドライバノード-->
-    <node name="rplidarNode"            pkg="rplidar_ros"  type="rplidarNode" output="screen">
+    <node name="Front_LRF"          pkg="rplidar_ros"  type="rplidarNode" output="screen">
       <param name="serial_port"         type="string" value="/dev/Front_LRF"/>
-      <param name="serial_baudrate"     type="int"    value="256000"/><!-- A3 -->
-      <param name="frame_id"            type="string" value="lrf_link"/>
+      <param name="serial_baudrate"     type="int"    value="1000000"/>
+      <param name="frame_id"            type="string" value="lrf_link_front"/>
+      <!-- <param name="frame_id"            type="string" value="lrf_link"/> -->
       <param name="inverted"            type="bool"   value="false"/>
       <param name="angle_compensate"    type="bool"   value="true"/>
-      <param name="scan_mode"           type="string" value="Sensitivity"/>
-      <param name="max_distance"        type="double"  value="4.2"/>
+      <param name="scan_mode"           type="string" value="Standard"/>
+      <remap from="scan" to="front_scan"/>
     </node>
-  </group>
 
-
-
-  <!-- RPLidar【s2】場合 20220516追記 -->
-  <group if="$(eval lrf=='s2')">
-    <!-- メガローバーの旋回中心からLRFまでの座標変換の設定 -->
-    <group if="$(eval rover_type=='mega3')">
-    <!-- メガローバーVer.3.0の場合 -->
-      <!-- argsの項でLRFの位置を調整できます。 args="x y z y p r" 20220518追記 -->
-      <node pkg="tf" type="static_transform_publisher" name="stp_laser" args="0.208 0 0.090 -4.71 0 0 base_link lrf_link 1" />
-    </group>
-    <group if="$(eval rover_type=='outdoor')">
-      <!-- メガローバーVer.3.0屋外対応版の場合 -->
-      <node pkg="tf" type="static_transform_publisher" name="stp_laser" args="0.208 0 0.090 1.57 0 0 base_link lrf_link 1" />
-    </group>
-
-    <!-- RPLiDARデバイスドライバノード-->
-    <node name="rplidarNode"            pkg="rplidar_ros"  type="rplidarNode" output="screen">
-      <param name="serial_port"         type="string" value="/dev/Front_LRF"/>
-      <param name="serial_baudrate"     type="int"    value="1000000"/><!-- S2 -->
-      <param name="frame_id"            type="string" value="lrf_link"/>
+    <node name="Rear_LRF"          pkg="rplidar_ros"  type="rplidarNode" output="screen">
+      <param name="serial_port"         type="string" value="/dev/Rear_LRF"/>
+      <param name="serial_baudrate"     type="int"    value="1000000"/>
+      <param name="frame_id"            type="string" value="lrf_link_rear"/>
+      <!-- <param name="frame_id"            type="string" value="lrf_link"/> -->
       <param name="inverted"            type="bool"   value="false"/>
       <param name="angle_compensate"    type="bool"   value="true"/>
-      <param name="scan_mode"           type="string" value="Standard"/><!-- S2 -->
-      <param name="max_distance"        type="double"  value="15"/>
+      <param name="scan_mode"           type="string" value="Standard"/>
+      <remap from="scan" to="rear_scan"/>
     </node>
   </group>
 
 
   <!-- mapサーバー -->
-  <arg name="map_file" default="$(find telecoV)/map/open_house.yaml"/> <!--マップファイルのパスの指定 -->
+  <!--以下でマップファイルのパスの指定 -->
+  <arg name="map_file" default="$(find telecoV)/map/dualgmap_3f.yaml"/>
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
- 
+
+  <!-- laserscan multi_merger を5秒間のディレイを設けて開始 -->
+  <arg name="node_start_delay" default="5.0" />
+  <node pkg="ira_laser_tools" name="laserscan_multi_merger" type="laserscan_multi_merger" output="screen" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' ">
+    <param name="destination_frame" value="laser"/>
+    <param name="scan_destination_topic" value="/scan"/>
+    <param name="laserscan_topics" value ="/front_scan /rear_scan" />
+    
+    <param name="angle_min" value="-3.14"/>
+    <param name="angle_max" value="3.14"/>
+    <param name="range_min" value="0.30"/>
+    <param name="range_max" value="25.0"/>
+  </node>
   <!-- 
     自己位置推定ノード amcl
     各パラメータについては http://wiki.ros.org/amcl
@@ -127,7 +126,7 @@
   <!--- 経路計画，指令値生成ノード　move_base -->
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" args="/cmd_vel:=/rover_twist">
     <rosparam file="$(find telecoV)/params/costmap_common_params.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find telecoV)//costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find telecoV)/params/costmap_common_params.yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find telecoV)/params/local_costmap_params.yaml" command="load" />
     <rosparam file="$(find telecoV)/params/global_costmap_params.yaml" command="load" />
     <rosparam file="$(find telecoV)/params/dwa_local_planner_params.yaml" command="load" />
@@ -135,5 +134,9 @@
   </node>
 
   <!-- Rviz -->
-  <node pkg="rviz" type="rviz" args="-d '$(find telecoV)/params/rviz/navigation.rviz'" name="visualizer" respawn="true" />
+  <arg name="rvizconfig" default="$(find telecoV)/params/rviz/navigation.rviz" />
+  <node pkg="telecoV" type="pub_info" name="pub_info" />
+  <node pkg="telecoV" type="multigoal_marker.py" name="multigoal_marker" />
+  <node pkg="robot_pose_publisher" type="robot_pose_publisher" name="robot_pose_publisher" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' "/>
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rvizconfig)" required="true" />
 </launch>

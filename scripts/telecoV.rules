@@ -1,0 +1,30 @@
+# set the udev rule , make the device_port be fixed by rplidar
+#
+# KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", MODE:="0777", SYMLINK+="rplidar"
+
+# cp2102 Front (rplider s2)
+# telecoV002
+#KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="d85a1297c713ec11b546f0ef7a109228", MODE:="0777", SYMLINK+="Front_LRF"
+# telecoV003
+#KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="ead3a41fb313ec11afe7f4ef7a109228", MODE:="0777", SYMLINK+="Front_LRF"
+# telecoV004
+KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="f4a2be83bb13ec119882f2ef7a109228", MODE:="0777", SYMLINK+="Front_LRF"
+
+# cp2102 Rear  (rplider s2)
+# telecoV002
+#KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="1cdbf0fc3713ec118cd1f4ef7a109228", MODE:="0777", SYMLINK+="Rear_LRF"
+# telecoV003
+#KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="9acf8825af13ec1196abfbef7a109228", MODE:="0777", SYMLINK+="Rear_LRF"
+# telecoV004
+KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="5c0596993113ec119e6bfbef7a109228", MODE:="0777", SYMLINK+="Rear_LRF"
+
+# FT231X
+# telecoV002
+#KERNEL=="ttyUSB*", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6015", ATTRS{serial}=="DP04C6HW", MODE:="0666", SYMLINK+="ROVER_BOARD"
+# telecoV003
+#KERNEL=="ttyUSB*", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6015", ATTRS{serial}=="DP04C6HX", MODE:="0666", SYMLINK+="ROVER_BOARD"
+# telecoV004
+KERNEL=="ttyUSB*", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6015", ATTRS{serial}=="D200CT3I", MODE:="0666", SYMLINK+="ROVER_BOARD"
+
+# USB Button (KOSUGI GIKEN　/ 清音タイプ)
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{product}=="KOSUGI. USB F.Switch", MODE="0777", SYMLINK+="input/callButton"

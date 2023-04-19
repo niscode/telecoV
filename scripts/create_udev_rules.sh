@@ -1,14 +1,13 @@
 #!/bin/bash
-echo "USB接続されたデバイスファイル名を固定します"
-echo "remap the device serial port(ttyUSBX) to  rplidar"
-echo "rplidar usb connection as /dev/rplidar , check it using the command : ls -l /dev|grep ttyUSB"
-echo "start copy rplidar.rules to  /etc/udev/rules.d/"
-echo "`rospack find rplidar_ros`/scripts/rplidar.rules"
-sudo cp `rospack find telecoV`/scripts/rplidar.rules  /etc/udev/rules.d
+
+echo "◯︎ remap the device serial port(ttyUSBX) to  telecoV"
+echo "●︎ telecoV usb connection as /dev/telecoV , check it using the command : ls -l /dev|grep ttyUSB"
+echo "●︎ start copy telecoV.rules to  /etc/udev/telecoV.d/"
+echo "`rospack find telecoV`/scripts/telecoV.rules"
+sudo cp `rospack find telecoV`/scripts/telecoV.rules  /etc/udev/rules.d
 echo " "
-echo "Restarting udev"
+echo "●︎︎ Restarting udev"
 echo ""
-sudo udevadm control --reload-rules
 sudo service udev reload
 sudo service udev restart
-echo "finish "
+echo "◯︎︎ finish︎"

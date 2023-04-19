@@ -1,0 +1,5 @@
+<library path="lib/libtelecoV">
+  <class name="telecoV/twist_panel" type="telecoV::TwistPanel" base_class_type="rviz::Panel">
+    <description>twist panel</description>
+  </class>
+</library>

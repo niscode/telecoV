@@ -14,16 +14,22 @@ created by ©︎niscode
 - 手順通りに進めると　$ roscore できるようになります。
 <br>
 
+
 ## [2/3] Ubuntu18.04 / ROS-melodic　環境で動作に必要なパッケージ群は以下の通りです。
 - `sudo apt -y install ros-melodic-rosserial`
 - `sudo apt -y install ros-melodic-slam-gmapping`
 - `sudo apt -y install ros-melodic-navigation`
+- `ros-melodic-map-server`
+- `ros-melodic-jsk-visualization`
 <br>
+
 - `cd catkin_ws/src`
 - `git clone https://github.com/niscode/telecoV.git`
 - `git clone https://github.com/Slamtec/rplidar_ros.git`
 - `git clone https://github.com/iralabdisco/ira_laser_tools.git`
+- `git clone https://github.com/GT-RAIL/robot_pose_publisher.git`
 <br>
+
 - `cd catkin_ws`
 - `catkin_make`
 <br>
@@ -40,6 +46,15 @@ created by ©︎niscode
 - `roslaunch telecoV dual_gmapping.launch`
 ### navigationによる自律移動は以下のように実行します。
 - `roslaunch telecoV dual_naivation.launch`
+
 <br><br>
 
 ### 20230217 - melodic更新を一時停止
+=======
+
+### cylinder昇降用スライダを表示するには以下を実行します。
+- `rosrun telecoV cylinder.py`
+<br>![シリンダー上下用のスライダー](img/slider.png)
+- スライダーを上下に動かし、任意の位置で Update ボタンを押すことで動作します。
+- ※ `rosrun rosserial_python serial_node.py _port:=/dev/ROVER_BOARD _baud:=115200` が実行中か、
+    navigationなどのパッケージ実行中のみ、昇降が可能です。

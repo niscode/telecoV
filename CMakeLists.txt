@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
+# cmake_minimum_required(VERSION 2.8.3)
 project(telecoV)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
@@ -18,6 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf2
   urdf
   xacro
+  rviz
 )
 
 ## System dependencies are found with CMake's conventions
@@ -28,6 +30,15 @@ find_package(catkin REQUIRED COMPONENTS
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
 # catkin_python_setup()
+
+# 2023/01/10 for Control Panel
+set(CMAKE_AUTOMOC ON)
+find_package(Qt5 ${rviz_QT_VERSION} EXACT REQUIRED
+  Core
+  Widgets
+)
+set(QT_LIBRARIES Qt5::Widgets)
+add_definitions(-DQT_NO_KEYWORDS)
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -110,10 +121,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES telecoV
-   CATKIN_DEPENDS geometry_msgs nav_msgs roscpp rospy sensor_msgs std_msgs tf tf2 urdf xacro
-#  DEPENDS system_lib
+  # INCLUDE_DIRS include
+  # LIBRARIES telecoV
+  CATKIN_DEPENDS geometry_msgs nav_msgs roscpp rospy sensor_msgs std_msgs tf tf2 urdf xacro
+  DEPENDS system_lib
 )
 
 ###########
@@ -131,6 +142,10 @@ include_directories(
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/telecoV.cpp
 # )
+add_library(${PROJECT_NAME}
+  src/qt_twist_panel.cpp
+  src/qt_touch.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -141,7 +156,12 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/telecoV_node.cpp)
-add_executable(telecoV_pub_odom src/pub_odom.cpp)
+# add_executable(telecoV_pub_odom src/pub_odom.cpp)
+add_executable(pub_odom src/pub_odom.cpp)
+add_executable(odom_listener src/odom_listener.cpp)
+add_executable(pub_info src/pub_info.cpp)
+add_executable(pub_fusion src/pub_fusion.cpp)
+
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -157,14 +177,39 @@ add_executable(telecoV_pub_odom src/pub_odom.cpp)
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(telecoV_pub_odom
+
+target_link_libraries(${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+  ${QT_LIBRARIES}
+)
+
+#target_link_libraries(telecoV_pub_odom
+#  ${catkin_LIBRARIES}
+#)
+
+target_link_libraries(pub_odom
   ${catkin_LIBRARIES}
 )
 
-set_target_properties(telecoV_pub_odom
+target_link_libraries(odom_listener
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(pub_info
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(pub_fusion
+  ${catkin_LIBRARIES}
+)
+
+#set_target_properties(telecoV_pub_odom
+#                      PROPERTIES OUTPUT_NAME pub_odom
+#                      PREFIX "")
+
+set_target_properties(pub_odom
                       PROPERTIES OUTPUT_NAME pub_odom
                       PREFIX "")
-
 
 #############
 ## Install ##
@@ -215,13 +260,13 @@ install(DIRECTORY params
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
-install(DIRECTORY meshes
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+#install(DIRECTORY meshes
+#  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+#)
 
-install(DIRECTORY robots
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+#install(DIRECTORY robots
+#  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+#)
 
 install(DIRECTORY urdf
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
