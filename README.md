@@ -16,12 +16,16 @@ created by ©︎niscode
 - `sudo apt -y install ros-noetic-rosserial`
 - `sudo apt -y install ros-noetic-slam-gmapping`
 - `sudo apt -y install ros-noetic-navigation`
+- `ros-noetic-map-server`
+- `ros-noetic-jsk-visualization`
+
 <br>
 
 - `cd catkin_ws/src`
 - `git clone https://github.com/niscode/telecoV.git`
 - `git clone https://github.com/Slamtec/rplidar_ros.git`
 - `git clone https://github.com/iralabdisco/ira_laser_tools.git`
+- `git clone https://github.com/GT-RAIL/robot_pose_publisher.git`
 <br>
 
 - `cd catkin_ws`
