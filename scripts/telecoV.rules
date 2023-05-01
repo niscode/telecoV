@@ -15,11 +15,11 @@
 # telecoV004
 #KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="f4a2be83bb13ec119882f2ef7a109228", MODE:="0777", SYMLINK+="Front_LRF"
 
-# expo-2Wheels
-KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="f4a2be83bb13ec119882f2ef7a109228", MODE:="0777", SYMLINK+="Front_LRF"
+# expo-2Wheels(V004)
+#KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="f4a2be83bb13ec119882f2ef7a109228", MODE:="0777", SYMLINK+="Front_LRF"
 
-# expo-OmniWheels
-
+# expo-OmniWheels(V003)
+KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="ead3a41fb313ec11afe7f4ef7a109228", MODE:="0777", SYMLINK+="Front_LRF"
 
 # cp2102 Rear  (rplider s2)
 # telecoV001
@@ -34,10 +34,11 @@ KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{seri
 # telecoV004
 #KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="5c0596993113ec119e6bfbef7a109228", MODE:="0777", SYMLINK+="Rear_LRF"
 
-# expo-2Wheels
-KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="5c0596993113ec119e6bfbef7a109228", MODE:="0777", SYMLINK+="Rear_LRF"
+# expo-2Wheels(V004)
+#KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="5c0596993113ec119e6bfbef7a109228", MODE:="0777", SYMLINK+="Rear_LRF"
 
-# expo-OmniWheels
+# expo-OmniWheels(V003)
+KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="9acf8825af13ec1196abfbef7a109228", MODE:="0777", SYMLINK+="Rear_LRF"
 
 
 # FT231X
