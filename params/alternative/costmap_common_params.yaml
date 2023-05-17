@@ -1,0 +1,22 @@
+# costmap common params for telecoV MEGAROVER
+# 2022年11月15日 ros-melodic版からコピー
+# （AIST） https://robo-marc.github.io/navigation_documents/costmap_2d.html#costmap2d-inflation
+
+# ロボットの大きさに関するパラメータ
+#footprint: [[0.1, -0.15], [0.1, 0.15], [-0.2, 0.15], [-0.2, -0.15]]
+#footprint: [[0.19, -0.21], [0.19, 0.21], [-0.18, 0.21], [-0.18, -0.21]]
+robot_radius: 0.3        # 半径 26cm
+
+#obstacle_layerの設定   LaserScan、PointCloud、PointCloud2の3つの型のデータから複数のデータを受けれる。   データ型は laser_scan_sensor: で指定する。
+obstacle_layer:
+  enabled: true
+
+  # これ以下の距離にある物体を障害物として扱う
+  obstacle_range: 3.5
+
+  # ロボットとの距離がraytrace_range以下のオブジェクトが検出された場合、そのオブジェクトの内側のコストマップの障害物がクリアされる。
+  raytrace_range: 8.0
+
+  # LRFの設定
+  observation_sources: laser_scan_sensor    # 受けるデータの名前を空白区切りのリストで書き込む
+  laser_scan_sensor: {sensor_frame: laser, data_type: LaserScan, topic: scan, marking: true, clearing: true, inf_is_valid: true}  # 以下に書き直し
