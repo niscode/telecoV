@@ -4,10 +4,11 @@ import os
 import sys
 import copy
 import pickle
+import random
 from typing import Dict
 import rospy
 from telecoV.msg import Waypoint, WaypointArray
-from geometry_msgs.msg import Pose, PoseStamped, Quaternion
+from geometry_msgs.msg import Pose, PoseStamped, Quaternion, PointStamped
 from std_srvs.srv import Empty
 from actionlib_msgs.msg import GoalID
 from move_base_msgs.msg import MoveBaseActionGoal
@@ -140,6 +141,8 @@ class WaypointServer:
         self._navigation_goal_publisher = rospy.Publisher('/move_base/goal', MoveBaseActionGoal, queue_size=10)
         self._waypoints_publisher = rospy.Publisher('/waypoint_server/waypoints', WaypointArray, queue_size=10, latch=True)
 
+        rospy.Subscriber('/clicked_point', PointStamped, self._clicked_point_cb, queue_size=10)
+
         self._tf_buffer = tf2_ros.Buffer()
         self._tf_listener = tf2_ros.TransformListener(self._tf_buffer)
 
@@ -173,6 +176,17 @@ class WaypointServer:
                 self._remove_waypoint(feedback.marker_name)
         if feedback.event_type == InteractiveMarkerFeedback.POSE_UPDATE:
             self._update_waypoint(feedback.marker_name, feedback.pose)
+
+    def _clicked_point_cb(self, msg: PointStamped) -> None:
+        prefix = 'clicked_point_'
+        name = f'{prefix}0'
+        while name in self._waypoints.keys():
+            name = f'{prefix}{random.randrange(100)}'
+        wp = Waypoint(name, PoseStamped(Header(), Pose(msg.point, Quaternion())))
+        wp.pose.header.frame_id = 'map'
+        self._waypoints[name] = wp
+        self._mh.add_goal_pose_marker(wp.pose, wp.label)
+        self._publish_waypoints()
 
     def _load_waypoints(self, path: str) -> Dict[str, Waypoint]:
         try:
