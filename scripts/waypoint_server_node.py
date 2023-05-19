@@ -236,7 +236,8 @@ class WaypointServer:
 
     def _rename_waypoint(self, source: str, destination: str) -> None:
         if destination in self._waypoints:
-            print(f'Waypoint "{destination}" doesn\'t exist')
+            print(f'Waypoint "{destination}" already exists')
+            return
         try:
             wp = self._waypoints.pop(source)
             self._mh.remove_goal_marker(source)
