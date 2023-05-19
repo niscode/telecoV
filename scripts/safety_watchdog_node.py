@@ -50,7 +50,8 @@ class SafetyWatchdog:
         return False
 
     def _move_base_status_cb(self, msg: GoalStatusArray) -> None:
-        self._current_status = msg.status_list[-1].status
+        if msg.status_list:
+            self._current_status = msg.status_list[-1].status
 
     def _laser_scan_cb(self, msg: LaserScan) -> None:
         self._minimum_laser_range = min(msg.ranges)

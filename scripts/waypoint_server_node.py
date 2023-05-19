@@ -184,6 +184,7 @@ class WaypointServer:
             name = f'{prefix}{random.randrange(100)}'
         wp = Waypoint(name, PoseStamped(Header(), Pose(msg.point, Quaternion())))
         wp.pose.header.frame_id = 'map'
+        wp.pose.pose.orientation.w = 1.0
         self._waypoints[name] = wp
         self._mh.add_goal_pose_marker(wp.pose, wp.label)
         self._publish_waypoints()
@@ -194,7 +195,10 @@ class WaypointServer:
                 ret = pickle.load(infile)
                 return ret
         except FileNotFoundError:
-            return {INITIAL_POSITION_NAME: Waypoint('init', PoseStamped())}
+            pose = PoseStamped(Header(), Pose())
+            pose.header.frame_id = 'map'
+            pose.pose.orientation.w = 1.0
+            return {INITIAL_POSITION_NAME: Waypoint(INITIAL_POSITION_NAME, pose)}
 
     def _save_waypoints(self, path: str, waypoints: Dict[str, Waypoint]) -> None:
         with open(path, 'wb') as outfile:
@@ -206,6 +210,7 @@ class WaypointServer:
             return
         wp = Waypoint(name, PoseStamped())
         wp.pose.header.frame_id = 'map'
+        wp.pose.pose.orientation.w = 1.0
         self._waypoints[name] = wp
         self._mh.add_goal_pose_marker(wp.pose, wp.label)
         self._publish_waypoints()
