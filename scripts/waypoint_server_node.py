@@ -145,6 +145,7 @@ class WaypointServer:
 
         self._shortcut_mapping = {'add': (self._add_waypoint, 'Add waypoint at 0,0,0 with name of argument', 1),
                                   'add_here': (self._add_waypoint_here, 'Add waypoint at current robot position ', 1),
+                                  'rename': (self._rename_waypoint, 'Renames waypoint argument1 in argument2', 2),
                                   'remove': (self._remove_waypoint, 'Removes waypoint with name of argument', 1),
                                   'list': (self._list_waypoints, 'Lists all waypoints', 0),
                                   'stop': (self._stop_navigation, 'Stops current navigation', 0),
@@ -215,9 +216,22 @@ class WaypointServer:
         try:
             self._waypoints.pop(name)
             self._mh.remove_goal_marker(name)
+            self._publish_waypoints()
         except KeyError:
             print(f'Waypoint "{name}" doesn\'t exist')
-        self._publish_waypoints()
+
+    def _rename_waypoint(self, source: str, destination: str) -> None:
+        if destination in self._waypoints:
+            print(f'Waypoint "{destination}" doesn\'t exist')
+        try:
+            wp = self._waypoints.pop(source)
+            self._mh.remove_goal_marker(source)
+            wp.label = destination
+            self._waypoints[destination] = wp
+            self._mh.add_goal_pose_marker(wp.pose, wp.label)
+            self._publish_waypoints()
+        except KeyError:
+            print(f'Waypoint "{source}" doesn\'t exist')
 
     def _update_waypoint(self, label, pose) -> None:
         if label in self._waypoints:
@@ -275,6 +289,8 @@ class WaypointServer:
                     mapping[0]()
                 elif mapping[2] == 1:
                     mapping[0](args[1])
+                elif mapping[2] == 2:
+                    mapping[0](args[1], args[2])
             except (KeyError, AttributeError, IndexError):
                 self._help()
 
