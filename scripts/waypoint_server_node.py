@@ -15,9 +15,13 @@ from interactive_markers.interactive_marker_server import *
 from interactive_markers.menu_handler import *
 from visualization_msgs.msg import *
 from geometry_msgs.msg import Point
+import tf2_ros
+from tf.transformations import euler_from_quaternion, quaternion_from_euler
 
-DEFAULT_PATH = '/home/arne/waypoints.bin'
-initial_position_name = 'init'
+DEFAULT_PATH = '/tmp/waypoints.bin'
+INITIAL_POSITION_NAME = 'init'
+REFERENCE_FRAME = 'map'
+ROBOT_FRAME = 'base_link'
 
 
 class WaypointMarkerHandler:
@@ -126,13 +130,21 @@ class WaypointServer:
     def __init__(self) -> None:
         rospy.init_node("waypoint_server_node")
         rospy.on_shutdown(self._shutdown_hook)
-        rospy.loginfo('Waypoint_Server started')
-        self._waypoints = self._load_waypoints(DEFAULT_PATH)
+        self._waypoint_filepath = rospy.get_param('/waypoint_server/waypoint_filepath', DEFAULT_PATH)
+        self._reference_frame = rospy.get_param('/waypoint_server/reference_frame', REFERENCE_FRAME)
+        self._robot_frame = rospy.get_param('/waypoint_server/robot_frame', ROBOT_FRAME)
+
+        self._waypoints = self._load_waypoints(self._waypoint_filepath)
 
         self._navigation_cancel_publisher = rospy.Publisher('/move_base/cancel', GoalID, queue_size=10)
         self._navigation_goal_publisher = rospy.Publisher('/move_base/goal', MoveBaseActionGoal, queue_size=10)
+        self._waypoints_publisher = rospy.Publisher('/waypoint_server/waypoints', WaypointArray, queue_size=10, latch=True)
+
+        self._tf_buffer = tf2_ros.Buffer()
+        self._tf_listener = tf2_ros.TransformListener(self._tf_buffer)
 
         self._shortcut_mapping = {'add': (self._add_waypoint, 'Add waypoint at 0,0,0 with name of argument', 1),
+                                  'add_here': (self._add_waypoint_here, 'Add waypoint at current robot position ', 1),
                                   'remove': (self._remove_waypoint, 'Removes waypoint with name of argument', 1),
                                   'list': (self._list_waypoints, 'Lists all waypoints', 0),
                                   'stop': (self._stop_navigation, 'Stops current navigation', 0),
@@ -145,10 +157,12 @@ class WaypointServer:
             waypoint = self._waypoints[w]
             self._mh.add_goal_pose_marker(waypoint.pose, str(waypoint.label))
 
+        self._publish_waypoints()
         self._running = True
+        rospy.loginfo('Waypoint_Server started')
 
     def _shutdown_hook(self) -> None:
-        self._save_waypoints(DEFAULT_PATH, self._waypoints)
+        self._save_waypoints(self._waypoint_filepath, self._waypoints)
 
     def _marker_changed_cb(self, feedback: InteractiveMarkerFeedback) -> None:
         if feedback.event_type == InteractiveMarkerFeedback.MENU_SELECT:
@@ -165,7 +179,7 @@ class WaypointServer:
                 ret = pickle.load(infile)
                 return ret
         except FileNotFoundError:
-            return {initial_position_name: Waypoint('init', PoseStamped())}
+            return {INITIAL_POSITION_NAME: Waypoint('init', PoseStamped())}
 
     def _save_waypoints(self, path: str, waypoints: Dict[str, Waypoint]) -> None:
         with open(path, 'wb') as outfile:
@@ -173,12 +187,29 @@ class WaypointServer:
 
     def _add_waypoint(self, name: str) -> None:
         if name in self._waypoints.keys():
-            print(f'Waypoint "{name}" aleady exists')
+            print(f'Waypoint "{name}" already exists')
             return
         wp = Waypoint(name, PoseStamped())
         wp.pose.header.frame_id = 'map'
         self._waypoints[name] = wp
         self._mh.add_goal_pose_marker(wp.pose, wp.label)
+        self._publish_waypoints()
+
+    def _add_waypoint_here(self, name: str) -> None:
+        if name in self._waypoints.keys():
+            print(f'Waypoint "{name}" already exists')
+            return
+        robot_transform = self._tf_buffer.lookup_transform(self._reference_frame, self._robot_frame, rospy.Time())
+        _, _, robot_yaw = euler_from_quaternion([robot_transform.transform.rotation.x, robot_transform.transform.rotation.y,
+                                                 robot_transform.transform.rotation.z, robot_transform.transform.rotation.w])
+        robot_rotation = quaternion_from_euler(0.0, 0.0, robot_yaw)
+        robot_pose = PoseStamped(Header(), Pose(Point(robot_transform.transform.translation.x, robot_transform.transform.translation.y, 0.0),
+                                                Quaternion(robot_rotation[0], robot_rotation[1], robot_rotation[2], robot_rotation[3])))
+        robot_pose.header.frame_id = 'map'
+        wp = Waypoint(name, robot_pose)
+        self._waypoints[name] = wp
+        self._mh.add_goal_pose_marker(wp.pose, wp.label)
+        self._publish_waypoints()
 
     def _remove_waypoint(self, name: str) -> None:
         try:
@@ -186,10 +217,12 @@ class WaypointServer:
             self._mh.remove_goal_marker(name)
         except KeyError:
             print(f'Waypoint "{name}" doesn\'t exist')
+        self._publish_waypoints()
 
-    def _update_waypoint(self, label, pose):
+    def _update_waypoint(self, label, pose) -> None:
         if label in self._waypoints:
             self._waypoints[label].pose.pose = pose
+        self._publish_waypoints()
 
     def _stop_navigation(self) -> None:
         print('Stopping navigation')
@@ -197,9 +230,11 @@ class WaypointServer:
         for i in range(5):
             self._navigation_cancel_publisher.publish(empty_goal)
 
-    def _list_waypoints(self):
+    def _list_waypoints(self) -> None:
         for w in self._waypoints.keys():
-            print(f'{w} -> [x:{self._waypoints[w].pose.pose.position.x}, y:{self._waypoints[w].pose.pose.position.y}, z:{self._waypoints[w].pose.pose.position.z}]')
+            _, _, yaw = euler_from_quaternion([self._waypoints[w].pose.pose.orientation.x, self._waypoints[w].pose.pose.orientation.y,
+                                               self._waypoints[w].pose.pose.orientation.z, self._waypoints[w].pose.pose.orientation.w])
+            print(f'{w} -> [x:{self._waypoints[w].pose.pose.position.x:.5f}, y:{self._waypoints[w].pose.pose.position.y:.5f}, z:{self._waypoints[w].pose.pose.position.z:.5f}, theta:{yaw:.5f}]')
 
     def _end_program(self) -> None:
         self._shutdown_hook()
@@ -217,10 +252,17 @@ class WaypointServer:
         move_base_goal.goal.target_pose.header.frame_id = 'map'
         self._navigation_goal_publisher.publish(move_base_goal)
 
+    def _publish_waypoints(self) -> None:
+        waypoints_msg = WaypointArray()
+        waypoints_msg.header = Header()
+        for w in self._waypoints:
+            waypoints_msg.waypoints.append(self._waypoints[w])
+        self._waypoints_publisher.publish(waypoints_msg)
+
     def _help(self) -> None:
         print('Usage: command [argument]')
         for k in self._shortcut_mapping:
-            print(f'{k}\t-> {self._shortcut_mapping[k][1]}')
+            print(f'{k}\t\t-> {self._shortcut_mapping[k][1]}')
 
     def run(self) -> None:
         while self._running:
