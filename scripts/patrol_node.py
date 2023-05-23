@@ -30,7 +30,7 @@ class PatrolServer:
         self._patrol_start_service = rospy.Service('/patrol/start', PatrolService, self._service_start_cb)
 
         self._current_goal_status = GoalStatus.SUCCEEDED
-        self._latest_waypoints = {}
+        self._latest_waypoints = dict()
         self._latest_goal = PoseStamped()
 
         self._patrolling = False
@@ -44,10 +44,10 @@ class PatrolServer:
             self._current_goal_status = msg.status_list[-1].status
 
     def _waypoint_cb(self, msg: WaypointArray) -> None:
+        latest_waypoints = dict()
         for w in msg.waypoints:
-            label = w.label
-            pose = w.pose
-            self._latest_waypoints[label] = pose
+            latest_waypoints[w.label] = w.pose
+        self._latest_waypoints = latest_waypoints
 
     def _service_cancel_cb(self, msg: Empty) -> EmptyResponse:
         self._patrolling = False
@@ -92,7 +92,10 @@ class PatrolServer:
         label = self._requested_waypoints[self._current_index % len(self._requested_waypoints)]
         rospy.loginfo(f'Selected requested waypoint: {label} as next goal')
         self._current_index += 1
-        self._send_navigation_goal(self._latest_waypoints[label])
+        if label in self._latest_waypoints:
+            self._send_navigation_goal(self._latest_waypoints[label])
+        else:
+            rospy.loginfo(f'Waypoint {label} is unknown and will be ignored')
 
     def run(self) -> None:
         rate = rospy.Rate(10)
