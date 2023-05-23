@@ -7,9 +7,9 @@
 #footprint: [[0.19, -0.21], [0.19, 0.21], [-0.18, 0.21], [-0.18, -0.21]]
 robot_radius: 0.26        # 半径 26cm
 footprint_padding: 0.0    # 0.0で真円 ⇆ 丸角の四角
-
-inflation_radius: 0.25
-cost_scaling_factor: 3.0
+inflation_layer:
+  inflation_radius: 3.0
+  cost_scaling_factor: 3.0
 
 
 #obstacle_layerの設定   LaserScan、PointCloud、PointCloud2の3つの型のデータから複数のデータを受けれる。   データ型は laser_scan_sensor: で指定する。
