@@ -56,11 +56,18 @@ class PatrolServer:
 
     def _service_start_cb(self, msg: PatrolService) -> PatrolServiceResponse:
         if (len(msg.waypoints) == 1 and msg.waypoints[0] == '') or len(msg.waypoints) == 0:
+            rospy.loginfo('Received empty patrol call... Patrolling randomly over all known waypoint')
             self._requested_waypoints = None
+            self._patrolling = True
+        elif (len(msg.waypoints) == 1 and msg.waypoints[0] != '') and msg.waypoints[0] in self._latest_waypoints:
+            rospy.loginfo('Received patrol call with only one waypoint... Navigating to waypoint and ending patrol')
+            self._send_navigation_goal(self._latest_waypoints[msg.waypoints[0]])
+            self._patrolling = False
         else:
+            rospy.loginfo('Received patrol call with list of waypoints... Patrolling over list')
             self._requested_waypoints = msg.waypoints
-        self._current_index = 0
-        self._patrolling = True
+            self._current_index = 0
+            self._patrolling = True
         return PatrolServiceResponse()
 
     def _cancel_navigation(self) -> None:
