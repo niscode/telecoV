@@ -64,7 +64,7 @@
   <!-- mapサーバー -->
   <!--以下でマップファイルのパスの指定 -->
 
-  <arg name="map_file" default="$(find telecoV)/map/expo_3f.yaml"/>
+  <arg name="map_file" default="$(find telecoV)/map/expo_1f.yaml"/>
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
 
   <!-- laserscan multi_merger を5秒間のディレイを設けて開始 -->
@@ -94,7 +94,7 @@
     <param name="kld_err" value="0.05"/>
     <param name="kld_z" value="0.95"/>
     <!--  オドメトリモデルのパラメータ, odom_alpha1からodom_alpha4はノイズパラメータ  -->
-    <param name="odom_model_type" value="omni"/>
+    <param name="odom_model_type" value="diff"/>
     <param name="odom_alpha1" value="0.1"/>
     <param name="odom_alpha2" value="0.1"/>
     <param name="odom_alpha3" value="0.1"/>

@@ -64,7 +64,7 @@
   <!-- mapサーバー -->
   <!--以下でマップファイルのパスの指定 -->
 
-  <arg name="map_file" default="$(find telecoV)/map/expo_3f.yaml"/>
+  <arg name="map_file" default="$(find telecoV)/map/expo_1f.yaml"/>
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
 
   <!-- laserscan multi_merger を5秒間のディレイを設けて開始 -->
@@ -89,7 +89,7 @@
   
   <node pkg="amcl" type="amcl" name="amcl" output="screen" args="/scan:=/scan">
         <!--- Odometery model parameters  -->
-        <param name="odom_model_type" value="omni"/>
+        <param name="odom_model_type" value="diff"/>
         <param name="odom_alpha1" value="7.0"/>
         <param name="odom_alpha2" value="5.0"/>
         <param name="odom_alpha3" value="5.0"/>
