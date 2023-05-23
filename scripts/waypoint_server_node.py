@@ -8,6 +8,7 @@ import random
 from typing import Dict
 import rospy
 from telecoV.msg import Waypoint, WaypointArray
+from telecoV.srv import WaypointService, WaypointServiceResponse
 from geometry_msgs.msg import Pose, PoseStamped, Quaternion, PointStamped
 from std_srvs.srv import Empty
 from actionlib_msgs.msg import GoalID
@@ -143,6 +144,10 @@ class WaypointServer:
 
         rospy.Subscriber('/clicked_point', PointStamped, self._clicked_point_cb, queue_size=10)
 
+        self._waypoint_add_service = rospy.Service('/waypoint_server/add', WaypointService, self._waypoint_service_cb)
+        self._waypoint_add_here_service = rospy.Service('/waypoint_server/add_here', WaypointService, self._waypoint_service_cb)
+        self._waypoint_remove_service = rospy.Service('/waypoint_server/remove', WaypointService, self._waypoint_service_cb)
+
         self._tf_buffer = tf2_ros.Buffer()
         self._tf_listener = tf2_ros.TransformListener(self._tf_buffer)
 
@@ -189,6 +194,20 @@ class WaypointServer:
         self._mh.add_goal_pose_marker(wp.pose, wp.label)
         self._publish_waypoints()
 
+    def _waypoint_service_cb(self, msg: WaypointService) -> WaypointServiceResponse:
+        if msg.argument == '':
+            return WaypointServiceResponse(sucess=False)
+
+        endpoint = msg._connection_header['service'].split('/')[-1]
+        ret = WaypointServiceResponse()
+        if endpoint == 'add':
+            ret.success = self._add_waypoint(msg.argument)
+        elif endpoint == 'add_here':
+            ret.success = self._add_waypoint_here(msg.argument)
+        elif endpoint == 'remove':
+            ret.success = self._remove_waypoint(msg.argument)
+        return ret
+
     def _load_waypoints(self, path: str) -> Dict[str, Waypoint]:
         try:
             with open(path, 'rb') as infile:
@@ -204,21 +223,22 @@ class WaypointServer:
         with open(path, 'wb') as outfile:
             pickle.dump(waypoints, outfile)
 
-    def _add_waypoint(self, name: str) -> None:
+    def _add_waypoint(self, name: str) -> bool:
         if name in self._waypoints.keys():
             print(f'Waypoint "{name}" already exists')
-            return
+            return False
         wp = Waypoint(name, PoseStamped())
         wp.pose.header.frame_id = 'map'
         wp.pose.pose.orientation.w = 1.0
         self._waypoints[name] = wp
         self._mh.add_goal_pose_marker(wp.pose, wp.label)
         self._publish_waypoints()
+        return True
 
-    def _add_waypoint_here(self, name: str) -> None:
+    def _add_waypoint_here(self, name: str) -> bool:
         if name in self._waypoints.keys():
             print(f'Waypoint "{name}" already exists')
-            return
+            return False
         robot_transform = self._tf_buffer.lookup_transform(self._reference_frame, self._robot_frame, rospy.Time())
         _, _, robot_yaw = euler_from_quaternion([robot_transform.transform.rotation.x, robot_transform.transform.rotation.y,
                                                  robot_transform.transform.rotation.z, robot_transform.transform.rotation.w])
@@ -230,14 +250,16 @@ class WaypointServer:
         self._waypoints[name] = wp
         self._mh.add_goal_pose_marker(wp.pose, wp.label)
         self._publish_waypoints()
+        return True
 
-    def _remove_waypoint(self, name: str) -> None:
-        try:
-            self._waypoints.pop(name)
-            self._mh.remove_goal_marker(name)
-            self._publish_waypoints()
-        except KeyError:
+    def _remove_waypoint(self, name: str) -> bool:
+        if name not in self._waypoints:
             print(f'Waypoint "{name}" doesn\'t exist')
+            return False
+        self._waypoints.pop(name)
+        self._mh.remove_goal_marker(name)
+        self._publish_waypoints()
+        return True
 
     def _rename_waypoint(self, source: str, destination: str) -> None:
         if destination in self._waypoints:

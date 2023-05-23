@@ -9,14 +9,15 @@ project(telecoV)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  geometry_msgs
-  nav_msgs
   roscpp
   rospy
+  geometry_msgs
   sensor_msgs
+  nav_msgs
   std_msgs
-  tf
+  std_srvs
   tf2
+  tf
   urdf
   xacro
   rviz
@@ -72,11 +73,11 @@ add_message_files(
 )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+  FILES
+  PatrolService.srv
+  WaypointService.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
