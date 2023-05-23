@@ -27,10 +27,10 @@ int main(int argc, char** argv){
 
   ros::Publisher  odom_pub = n.advertise<nav_msgs::Odometry>("odom", 50);  // ... Publiserを作成 テンプレート引数「nav_msgs::Odometry」を与える
 
-  ros::Subscriber odom_sub = n.subscribe("/rover_odo", 100, roverOdomCallback);  // ... Subscriverを作成 「/rover_odo」という名前でキューのサイズが「100」 (メッセージにキューが達すると新しいメッセージがくる度に古いものを捨てる)、メッセージを受信するたびに「roverOdomCallBack」という関数を呼び出す
+  ros::Subscriber odom_sub = n.subscribe("/rover_odo", 100, roverOdomCallback);  // ... Subscriverを作成 「/rover_odo」という名前でキューのサイズが「100」、メッセージを受信した時の処理が「roverOdomCallBack」という関数になるように登録
 
-//   tf::TransformBroadcaster odom_broadcaster;
-  tf2_ros::TransformBroadcaster odom_broadcaster;
+  tf::TransformBroadcaster odom_broadcaster;
+  // tf2_ros::TransformBroadcaster odom_broadcaster;
 
   //get params
   ros::param::param<double>("odom_kv", odom_kv, 1.0);
@@ -62,7 +62,8 @@ int main(int argc, char** argv){
 
     //since all odometry is 6DOF we'll need a quaternion created from yaw
     // geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
-    geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
+    // for expo
+    geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th*2);
 
     //check null quaternion
     if(odom_quat.x == 0.0 && odom_quat.y == 0.0 && odom_quat.z == 0.0 && odom_quat.w == 0.0){
