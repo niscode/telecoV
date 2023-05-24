@@ -19,7 +19,7 @@ TebLocalPlannerROS:
          
  max_vel_x: 0.7
  max_vel_x_backwards: 0.2
- max_vel_y: 0.5
+ max_vel_y: 0.0
  max_vel_theta: 0.7
  acc_lim_x: 0.5
  acc_lim_y: 0.5
@@ -41,14 +41,18 @@ TebLocalPlannerROS:
  min_obstacle_dist: 0.25 # This value must also include our robot radius, since footprint_model is set to "point".
  inflation_dist: 0.6
  include_costmap_obstacles: True
- costmap_obstacles_behind_robot_dist: 1.0
+ costmap_obstacles_behind_robot_dist: 1.5
  obstacle_poses_affected: 15
+
+ dynamic_obstacle_inflation_dist: 0.6
+ include_dynamic_obstacles: True
+
  costmap_converter_plugin: ""
  costmap_converter_spin_thread: True
  costmap_converter_rate: 5
 
  # Optimization
-    
+
  no_inner_iterations: 5
  no_outer_iterations: 4
  optimization_activate: True
@@ -56,12 +60,10 @@ TebLocalPlannerROS:
  penalty_epsilon: 0.1
  obstacle_cost_exponent: 4
  weight_max_vel_x: 2
- weight_max_vel_y: 2
  weight_max_vel_theta: 1
  weight_acc_lim_x: 1
- weight_acc_lim_y: 1
  weight_acc_lim_theta: 1
- weight_kinematics_nh: 1 # WE HAVE A HOLONOMIC ROBOT, JUST ADD A SMALL PENALTY
+ weight_kinematics_nh: 1000
  weight_kinematics_forward_drive: 1
  weight_kinematics_turning_radius: 1
  weight_optimaltime: 1 # must be > 0
@@ -80,7 +82,7 @@ TebLocalPlannerROS:
  max_number_classes: 4
  selection_cost_hysteresis: 1.0
  selection_prefer_initial_plan: 0.9
- selection_obst_cost_scale: 1.0
+ selection_obst_cost_scale: 100.0
  selection_alternative_time_cost: False
  
  roadmap_graph_no_samples: 15
