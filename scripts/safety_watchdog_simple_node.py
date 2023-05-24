@@ -26,9 +26,7 @@ class SafetyWatchdog:
 
         rospy.Subscriber('/scan', LaserScan, self._laser_scan_cb, queue_size=1)
         rospy.Subscriber('/move_base/status', GoalStatusArray, self._move_base_status_cb, queue_size=1)
-        rospy.Subscriber('/move_base/goal', MoveBaseActionGoal, self._move_base_goal_cb, queue_size=1)
         self._navigation_cancel_publisher = rospy.Publisher('/move_base/cancel', GoalID, queue_size=10)
-        self._move_base_goal_publisher = rospy.Publisher('/move_base/goal', MoveBaseActionGoal, queue_size=1)
         self._patrol_cancel_service = rospy.ServiceProxy('/patrol/cancel', Empty)
 
         self._current_status = GoalStatus.SUCCEEDED

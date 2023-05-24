@@ -135,6 +135,7 @@ class WaypointServer:
         self._waypoint_filepath = rospy.get_param('/waypoint_server/waypoint_filepath', DEFAULT_PATH)
         self._reference_frame = rospy.get_param('/waypoint_server/reference_frame', REFERENCE_FRAME)
         self._robot_frame = rospy.get_param('/waypoint_server/robot_frame', ROBOT_FRAME)
+        self._use_cli = rospy.get_param('/waypoint_server/cli', False)
 
         self._waypoints = self._load_waypoints(self._waypoint_filepath)
 
@@ -321,20 +322,23 @@ class WaypointServer:
             print(f'{k}\t\t-> {self._shortcut_mapping[k][1]}')
 
     def run(self) -> None:
-        while self._running:
-            print('>>> ', end='')
-            val = input()
-            try:
-                args = val.split(' ')
-                mapping = self._shortcut_mapping[args[0]]
-                if mapping[2] == 0:
-                    mapping[0]()
-                elif mapping[2] == 1:
-                    mapping[0](args[1])
-                elif mapping[2] == 2:
-                    mapping[0](args[1], args[2])
-            except (KeyError, AttributeError, IndexError):
-                self._help()
+        if self._use_cli:
+            while self._running:
+                print('>>> ', end='')
+                val = input()
+                try:
+                    args = val.split(' ')
+                    mapping = self._shortcut_mapping[args[0]]
+                    if mapping[2] == 0:
+                        mapping[0]()
+                    elif mapping[2] == 1:
+                        mapping[0](args[1])
+                    elif mapping[2] == 2:
+                        mapping[0](args[1], args[2])
+                except (KeyError, AttributeError, IndexError):
+                    self._help()
+        else:
+            rospy.spin()
 
 
 if __name__ == '__main__':
