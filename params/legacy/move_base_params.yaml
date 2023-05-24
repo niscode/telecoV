@@ -1,0 +1,26 @@
+# move base params for telecoV MEGAROVER
+# 2022年11月15日 ros-melodic版からコピー
+
+# プランナーの設定
+base_global_planner: "navfn/NavfnROS"
+base_local_planner: "dwa_local_planner/DWAPlannerROS"
+
+# 指令値の出力周波数（制御周期）
+controller_frequency: 10.0
+
+# true: アクティブ状態のとき（目標を与えられてから目標に到達するまで）にのみコストマップをセンサーからの情報で更新
+# shutdown_costmaps: true
+shutdown_costmaps: false
+
+# プランナーが有効なプランを見つけられない時に、スペースクリアリング操作が実行されるまでの待機時間（秒単位） default :5.0
+planner_patience: 2.5
+
+# 地図内のスペースをクリアしようとするときに、 コストマップ から障害物がクリアされるロボットからの距離（メートル単位）。このパラメータは、move_baseにデフォルトのリカバリ動作が使用される場合にのみ使用されることに注意。　default: 3.0
+conservative_reset_dist: 3.0
+
+# グローバルプランニングループを実行する周期（Hz単位）。頻度が0.0に設定されている場合、グローバルプランナーは、新しい目標が受信されるか、ローカルプランナーがその経路がブロックされていると報告したときにのみ実行される。 default: 0.0
+planner_frequency: 5.0
+
+# ロボットが、一定時間( oscillation_timeout )の間、一定の距離( oscillation_distance )以上を移動できなかった場合は、ロボットがスタックしたとみなして、ローカルプランナーによる駆動命令演算を一時停止して、リカバリ制御を起動する。
+oscillation_timeout: 10.0
+oscillation_distance: 0.2

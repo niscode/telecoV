@@ -9,14 +9,15 @@ project(telecoV)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  geometry_msgs
-  nav_msgs
   roscpp
   rospy
+  geometry_msgs
   sensor_msgs
+  nav_msgs
   std_msgs
-  tf
+  std_srvs
   tf2
+  tf
   urdf
   xacro
   rviz
@@ -65,18 +66,18 @@ add_definitions(-DQT_NO_KEYWORDS)
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+  FILES
+  Waypoint.msg
+  WaypointArray.msg
+)
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+  FILES
+  PatrolService.srv
+  WaypointService.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -85,11 +86,11 @@ add_definitions(-DQT_NO_KEYWORDS)
 #   Action2.action
 # )
 
-## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   geometry_msgs#   nav_msgs#   sensor_msgs#   std_msgs
-# )
+# Generate added messages and services with any dependencies listed here
+generate_messages(
+  DEPENDENCIES
+  std_msgs geometry_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -157,7 +158,8 @@ add_library(${PROJECT_NAME}
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/telecoV_node.cpp)
 # add_executable(telecoV_pub_odom src/pub_odom.cpp)
-add_executable(pub_odom src/pub_odom.cpp)
+add_executable(pub_diff_odom src/pub_diff_odom.cpp)
+add_executable(pub_omni_odom src/pub_omni_odom.cpp)
 add_executable(odom_listener src/odom_listener.cpp)
 add_executable(pub_info src/pub_info.cpp)
 add_executable(pub_fusion src/pub_fusion.cpp)
@@ -187,7 +189,11 @@ target_link_libraries(${PROJECT_NAME}
 #  ${catkin_LIBRARIES}
 #)
 
-target_link_libraries(pub_odom
+target_link_libraries(pub_diff_odom
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(pub_omni_odom
   ${catkin_LIBRARIES}
 )
 
@@ -207,9 +213,9 @@ target_link_libraries(pub_fusion
 #                      PROPERTIES OUTPUT_NAME pub_odom
 #                      PREFIX "")
 
-set_target_properties(pub_odom
-                      PROPERTIES OUTPUT_NAME pub_odom
-                      PREFIX "")
+#set_target_properties(pub_odom
+#                      PROPERTIES OUTPUT_NAME pub_odom
+#                      PREFIX "")
 
 #############
 ## Install ##

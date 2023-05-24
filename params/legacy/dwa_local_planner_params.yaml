@@ -1,0 +1,65 @@
+# DWA Planner params for telecoV MEGAROVER
+# 2022年11月15日 ros-melodic版からコピー
+# 各パラメータについては https://robo-marc.github.io/navigation_documents/dwa_local_planner.html を参照（AIST）
+
+DWAPlannerROS:
+## Robot Configuration Parameters/ロボット構成パラメーター
+  max_vel_x: 2.0
+  min_vel_x: -1.0
+  max_vel_y: 0.0
+  min_vel_y: 0.0
+  
+  # The velocity when robot is moving in a straight line
+  max_vel_trans: 2.5
+  min_vel_trans: 0.5
+  
+  # max_vel_theta: 1.5
+  max_vel_theta: 1.0
+  min_vel_theta: 0.0
+
+  acc_lim_x: 2.0
+  # acc_lim_y: 2.0
+  acc_lim_y: 0.0
+  # acc_lim_th: 1.0
+  acc_lim_th: 2.0
+
+
+## Goal Tolerance Parametes/ゴール許容誤差パラメーター   ロボットが停止した後、ゴール方向にその場回転を行います
+  xy_goal_tolerance: 0.2   # ゴール地点に到達したときのコントローラーの 2D平面上距離の許容誤差[m]
+  yaw_goal_tolerance: 0.2  # ゴール地点に到達したときの、コントローラーの向き(回転角)の許容誤差[rad] (0.5236 - 30°, 0.2 - 11.4°)
+  latch_xy_goal_tolerance: false   # trueの場合、ロボットがゴール地点に到達すると、後はその場回転のみ行います。回転の間にゴール許容誤差の範囲外になることもあります。
+
+
+## Forward Simulation Parameters/フォワードシミュレーションパラメーター
+  sim_time: 4.0   # 軌道をフォワードシミュレーションする時間  [s] 1.7
+  sim_granularity: 0.05   # ゴール地点に到達したときの、コントローラーの 2D平面上距離の許容誤差  [m] 0.025
+  vx_samples: 20  # 10
+  # vtheta_samples: 20
+  vth_samples: 40 # 20
+  controller_frequency: 10.0  # move_base_params.yaml と一緒
+
+
+## Trajectory Scoring Parameters/軌道スコアリングパラメーター
+  path_distance_bias: 72.0  # コントローラーがパスにどれだけ近づこうとするかの重み  default: 32.0
+  goal_distance_bias: 24.0  # コントローラーがローカルの目標にどれだけ近づこうとするかの重み。このパラメーターは速度も制御する。  default: 32.0
+  occdist_scale: 1.5  # コントローラーが障害物をどれだけ回避しようとするかの重み  default: 0.01  [かつて： 1.0]
+  forward_point_distance: 0.325 #追加のスコアリングポイントを配置するためのロボット中心点からの距離。 (ロボットの向きの評価で使用)  default: 0.325　 [かつて　0.1]
+  # stop_time_buffer: 0.2  # 軌道が有効と見なされるために、衝突前にロボットが停止しなければならない時間。  default: 0.2
+  scaling_speed: 0.25  # ロボットの footprint のスケーリングを開始する速度の絶対値  default: 0.25
+  max_scaling_factor: 0.2  # ロボットの footprint をスケーリングする最大係数  default: 0.2
+  use_dwa: true
+  publish_cost_grid: false   # プランナーが計画時に使用するコストグリッドを公開するかどうか。  default: false
+
+
+## Oscillation Prevention Parameters/振動防止パラメーター
+  oscillation_reset_dist: 1.0   # 振動フラグがリセットされるまでにロボットが移動する必要がある距離 [m]  default: 0.05
+  oscillation_reset_angle: 1.0
+
+  publish_cost_grid_pc: true
+
+  publish_traj_pc: true
+  global_frame_id: odom
+
+
+## グローバルプランパラメーター
+  prune_plan: true   #パスに沿って移動するときにプランを「食べていくか」を定義 ロボットが移動した際に経路のうち現在位置から1メートル以上過去の点は消える。
