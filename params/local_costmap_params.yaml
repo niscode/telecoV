@@ -1,44 +1,25 @@
-# local costmap params for telecoV MEGAROVER
-# 2022年11月15日 ros-melodic版からコピー
-# （AIST） https://robo-marc.github.io/navigation_documents/costmap_2d.html#costmap2d-inflation
+# local costmap params for MECANUMROVER
 
 local_costmap:
   plugins:
-    - {name: obstacle_layer,  type: "costmap_2d::ObstacleLayer"}    # LaserScanやPointCloud型のLidarのデータをmapに取り込む
-    - {name: inflation_layer, type: "costmap_2d::InflationLayer"}   # マップ上の障害物を機体の大きさに合わせて膨張処理を行う
+    - {name: obstacle_layer,  type: "costmap_2d::ObstacleLayer"}
+    - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
 
-# 各TFフレームの設定
+  # 各TFフレームの設定
   global_frame: odom
   robot_base_frame: base_link
 
-# 更新頻度の設定
-  # update_frequency: 3.0
-  # update_frequency: 1.0
+  # 更新頻度の設定
   update_frequency: 10.0
-
-  # publish_frequency: 3.0
   publish_frequency: 10.0
 
-# タイムスタンプのずれの許容量
-  # transform_tolerance: 0.5
-  transform_tolerance: 1.0
-
-# default: false,（Pre-Hydro parameter） trueの場合,rolling_windowsをfalseに設定する必要がある
-  # static_map: false
-
-# ローカルコストマップの計算範囲: 自分の周りの一部だけのcostmap（障害物をマゼンタ膨張箇所をシアンで表示など）を使うオプション, ローカルではtrueにします。width、heightは切り取るサイズです。
+  # ローカルコストマップの計算範囲
   rolling_window: true
   width: 3.0
   height: 3.0
 
-# ローカルコストマップの解像度
+  # ローカルコストマップの解像度
   resolution: 0.05
 
-
-## 以下の項目は costmap_commom_params.yaml で設定
-  # obstacle_layer:
-
-  # inflation_layer:
-    # inflation_radius: 0.05    # default: 0.55
-    # inflation_radius: 0.1
-    # cost_scaling_factor: 10   # defalut: 10, 膨張処理時にコスト値の計算に適用する係数
+  # タイムスタンプのずれの許容量
+  transform_tolerance: 0.5

@@ -5,18 +5,35 @@
 # ロボットの大きさに関するパラメータ
 #footprint: [[0.1, -0.15], [0.1, 0.15], [-0.2, 0.15], [-0.2, -0.15]]
 #footprint: [[0.19, -0.21], [0.19, 0.21], [-0.18, 0.21], [-0.18, -0.21]]
-robot_radius: 0.3        # 半径 26cm
+robot_radius: 0.26        # 半径 26cm
+footprint_padding: 0.0    # 0.0で真円 ⇆ 丸角の四角
+
+inflation_radius: 0.25
+cost_scaling_factor: 3.0
+
 
 #obstacle_layerの設定   LaserScan、PointCloud、PointCloud2の3つの型のデータから複数のデータを受けれる。   データ型は laser_scan_sensor: で指定する。
 obstacle_layer:
   enabled: true
 
   # これ以下の距離にある物体を障害物として扱う
-  obstacle_range: 3.5
+  # obstacle_range: 3.5
+  obstacle_range: 1.5
 
   # ロボットとの距離がraytrace_range以下のオブジェクトが検出された場合、そのオブジェクトの内側のコストマップの障害物がクリアされる。
-  raytrace_range: 8.0
+  # raytrace_range: 8.0
+  raytrace_range: 3.0
 
   # LRFの設定
   observation_sources: laser_scan_sensor    # 受けるデータの名前を空白区切りのリストで書き込む
-  laser_scan_sensor: {sensor_frame: laser, data_type: LaserScan, topic: scan, marking: true, clearing: true, inf_is_valid: true}  # 以下に書き直し
+  # laser_scan_sensor: {sensor_frame: laser, data_type: LaserScan, topic: scan, marking: true, clearing: true, inf_is_valid: true}  # 以下に書き直し
+  laser_scan_sensor:
+    sensor_frame: laser
+    data_type: LaserScan
+    topic: scan
+    marking: true       # データをマップを埋めるのに使うかの指定
+    clearing: true      # クリアするのに使うかの指定
+    inf_is_valid: true
+    # observation_persistence: 0.0  # ？？？
+    # max_obstacle_height: 0.3      # ？？？  cm?
+    # min_obstacle_height: 0.0      # ？？？

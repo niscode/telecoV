@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+  <node name="waypoint_server" pkg="telecoV" type="waypoint_server_node.py" output="screen">
+    <param name="waypoint_filepath" value="$(find telecoV)/waypoints/waypoints.bin" />
+    <param name="reference_frame" value="map" />
+    <param name="robot_frame" value="base_link" />
+  </node>
+</launch>
