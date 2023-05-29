@@ -1,5 +1,3 @@
-# local costmap params for MECANUMROVER
-
 local_costmap:
   plugins:
     - {name: obstacle_layer,  type: "costmap_2d::ObstacleLayer"}
@@ -15,8 +13,8 @@ local_costmap:
 
   # ローカルコストマップの計算範囲
   rolling_window: true
-  width: 3.0
-  height: 3.0
+  width: 10.0
+  height: 10.0
 
   # ローカルコストマップの解像度
   resolution: 0.05

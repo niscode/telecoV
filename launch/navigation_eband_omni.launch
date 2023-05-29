@@ -64,7 +64,7 @@
   <!-- mapサーバー -->
   <!--以下でマップファイルのパスの指定 -->
 
-  <arg name="map_file" default="$(find telecoV)/map/expo_3f.yaml"/>
+  <arg name="map_file" default="$(find telecoV)/map/expo_1f.yaml"/>
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
 
   <!-- laserscan multi_merger を5秒間のディレイを設けて開始 -->
@@ -104,5 +104,5 @@
   <node pkg="telecoV" type="pub_info" name="pub_info" />
   <!-- <node pkg="telecoV" type="multigoal_marker.py" name="multigoal_marker" /> -->
   <node pkg="robot_pose_publisher" type="robot_pose_publisher" name="robot_pose_publisher" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' "/>
-  <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rvizconfig)" required="true" />
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rvizconfig)" />
 </launch>
