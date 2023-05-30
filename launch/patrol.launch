@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+  <node name="patrol" pkg="telecoV" type="patrol_node.py" output="screen">
+      <param name="reference_frame" type="str" value="map" />
+    <param name="robot_frame" type="str" value="base_link" />
+  </node>
+</launch>
