@@ -50,7 +50,7 @@ class PatrolServer:
             if (state == GoalStatus.PREEMPTED or state == GoalStatus.PREEMPTING) and not (self._latest_goal_status == GoalStatus.PREEMPTED or self._latest_goal_status == GoalStatus.PREEMPTING):
                 rospy.loginfo('Navigation was externally preempted - Patrol Stopped!')
                 self._should_patrol = False
-            if state == GoalStatus.ACTIVE and self._latest_goal_status != state == GoalStatus.ACTIVE:
+            if state == GoalStatus.ACTIVE and self._latest_goal_status != state == GoalStatus.ACTIVE and self._latest_goal_status != state == GoalStatus.LOST:
                 self._should_patrol = True
             self._latest_goal_status = state
 
@@ -62,6 +62,7 @@ class PatrolServer:
 
     def _service_cancel_cb(self, msg: Empty) -> EmptyResponse:
         self._should_patrol = False
+        self._reach_waypoint = False
         rospy.loginfo('Patrol cancelled... Robot will stop after reaching current waypoint.')
         return EmptyResponse()
 
