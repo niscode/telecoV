@@ -68,6 +68,8 @@ add_definitions(-DQT_NO_KEYWORDS)
 ## Generate messages in the 'msg' folder
 add_message_files(
   FILES
+  RobotStatus.msg
+  StringArray.msg
   Waypoint.msg
   WaypointArray.msg
 )
