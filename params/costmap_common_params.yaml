@@ -1,7 +1,3 @@
-# costmap common params for telecoV MEGAROVER
-# 2022年11月15日 ros-melodic版からコピー
-# （AIST） https://robo-marc.github.io/navigation_documents/costmap_2d.html#costmap2d-inflation
-
 # ロボットの大きさに関するパラメータ
 #footprint: [[0.1, -0.15], [0.1, 0.15], [-0.2, 0.15], [-0.2, -0.15]]
 #footprint: [[0.19, -0.21], [0.19, 0.21], [-0.18, 0.21], [-0.18, -0.21]]
