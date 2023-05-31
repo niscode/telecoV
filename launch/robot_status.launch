@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+  <node name="robot_status" pkg="telecoV" type="robot_status_node.py" output="screen">
+      <param name="reference_frame" type="str" value="map" />
+    <param name="robot_frame" type="str" value="base_link" />
+  </node>
+</launch>
