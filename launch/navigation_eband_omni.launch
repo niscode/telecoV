@@ -7,78 +7,24 @@
 -->
 
 <launch>
-  <!-- 引数 -->
-  <arg name="rover_type"  default="mega3"  doc="mega3 / outdoor" />
-  <arg name="lrf"         default="s2"  doc="s2"/>
+  <arg name="rover_type"        default="mega3"  doc="mega3 / outdoor" />
+  <arg name="lrf"               default="s2"     doc="s2"/>
+  <arg name="node_start_delay"  default="5.0" />
 
-  <!-- ROVERとの接続 -->
-  <node pkg="rosserial_python" name="serial_node" type="serial_node.py" output="screen">
-    <param name="port" value="/dev/ROVER_BOARD" />
-    <param name="baud" value="115200" />
-  </node>
+  <!-- bringup telecoV -->
+  <include file="$(find telecoV)/launch/bringup_telecov.launch">
+    <arg name="rover_type" value="$(arg rover_type)" />
+    <arg name="lrf" value="$(arg lrf)" />
+    <arg name="node_start_delay" value="$(arg node_start_delay)" />
+  </include>
 
   <!-- オドメトリの配信ノード -->
   <node pkg="telecoV" type="pub_omni_odom" name="pub_omni_odom" />
 
-  <!-- RPLidar【s2】場合 20220516追記 -->
-  <group if="$(eval lrf=='s2')">
-    <!-- メガローバーの旋回中心からLRFまでの座標変換の設定 -->
-    <group if="$(eval rover_type=='mega3')">
-      <!-- メガローバーVer.3.0の場合 -->
-      <!-- base_linkから見たLRFの位置を調整する args="x y z y p r parent_node child_node period_in_ms" 20220817追記 -->
-      <node pkg="tf" type="static_transform_publisher" name="stp_laser01" args="0 0 0 0 0 0 base_link laser 100" />
-      <!-- 万博teleco用 -->
-      <node pkg="tf" type="static_transform_publisher" name="stp_laser02" args="0.230 0 0.050 -1.57 0 0 base_link lrf_link_front 100" />
-      <node pkg="tf" type="static_transform_publisher" name="stp_laser03" args="-0.230 0 0.050 1.57 0 0 base_link lrf_link_rear 100"/>
-    </group>
-    <group if="$(eval rover_type=='outdoor')">
-      <!-- メガローバーVer.3.0屋外対応版の場合 -->
-      <node pkg="tf" type="static_transform_publisher" name="stp_laser" args="0.208 0 0.090 -1.57 0 0 base_link lrf_link 1" />
-    </group>
-
-    <!-- RPLiDARデバイスドライバノード-->
-    <node name="Front_LRF"          pkg="rplidar_ros"  type="rplidarNode" output="screen">
-      <param name="serial_port"         type="string" value="/dev/Front_LRF"/>
-      <param name="serial_baudrate"     type="int"    value="1000000"/>
-      <param name="frame_id"            type="string" value="lrf_link_front"/>
-      <!-- <param name="frame_id"            type="string" value="lrf_link"/> -->
-      <param name="inverted"            type="bool"   value="false"/>
-      <param name="angle_compensate"    type="bool"   value="true"/>
-      <param name="scan_mode"           type="string" value="Standard"/>
-      <remap from="scan" to="front_scan"/>
-    </node>
-
-    <node name="Rear_LRF"          pkg="rplidar_ros"  type="rplidarNode" output="screen">
-      <param name="serial_port"         type="string" value="/dev/Rear_LRF"/>
-      <param name="serial_baudrate"     type="int"    value="1000000"/>
-      <param name="frame_id"            type="string" value="lrf_link_rear"/>
-      <!-- <param name="frame_id"            type="string" value="lrf_link"/> -->
-      <param name="inverted"            type="bool"   value="false"/>
-      <param name="angle_compensate"    type="bool"   value="true"/>
-      <param name="scan_mode"           type="string" value="Standard"/>
-      <remap from="scan" to="rear_scan"/>
-    </node>
-  </group>
-
-
   <!-- mapサーバー -->
   <!--以下でマップファイルのパスの指定 -->
-
   <arg name="map_file" default="$(find telecoV)/map/expo_1f.yaml"/>
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
-
-  <!-- laserscan multi_merger を5秒間のディレイを設けて開始 -->
-  <arg name="node_start_delay" default="5.0" />
-  <node pkg="ira_laser_tools" name="laserscan_multi_merger" type="laserscan_multi_merger" output="screen" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' ">
-    <param name="destination_frame" value="laser"/>
-    <param name="scan_destination_topic" value="/scan"/>
-    <param name="laserscan_topics" value ="/front_scan /rear_scan" />
-    
-    <param name="angle_min" value="-3.14"/>
-    <param name="angle_max" value="3.14"/>
-    <param name="range_min" value="0.56"/>
-    <param name="range_max" value="25.0"/>
-  </node>
   
   <!-- 
     自己位置推定ノード amcl

@@ -1,0 +1,6 @@
+std_msgs/Header header
+string navigation_status
+string navigation_status_text
+geometry_msgs/PoseStamped latest_goal
+geometry_msgs/PoseStamped current_position
+string[] console_messages
