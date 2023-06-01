@@ -11,7 +11,7 @@ from std_msgs.msg import Header
 from geometry_msgs.msg import Point, Pose, PoseStamped, Quaternion
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from telecoV.msg import RobotStatus
-from telecoV.srv import GoalHeadingService, GoalHeadingServiceResponse
+from telecoV.srv import GoalHeadingService, GoalHeadingServiceResponse, RelativeTurnService, RelativeTurnServiceResponse
 import tf2_ros
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
 
@@ -26,13 +26,14 @@ class ConvenienceServer:
         self._reference_frame = rospy.get_param('/convenience_server/reference_frame', REFERENCE_FRAME)
         self._robot_frame = rospy.get_param('/convenience_server/robot_frame', ROBOT_FRAME)
 
-        # rospy.loginfo('Waiting for move_base')
-        # self._move_base_client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
-        # self._move_base_client.wait_for_server()
+        rospy.loginfo('Waiting for move_base')
+        self._move_base_client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
+        self._move_base_client.wait_for_server()
 
         self._goal_heading_debug_publisher = rospy.Publisher('/convenience_server/debug/goal_heading', PoseStamped, queue_size=10)
         rospy.Subscriber('/robot_status/status', RobotStatus, self._robot_status_cb, queue_size=1)
         self._goal_heading_service = rospy.Service('/convenience_server/goal_heading', GoalHeadingService, self._goal_heading_service_cb)
+        self._goal_heading_service = rospy.Service('/convenience_server/relative_turn', RelativeTurnService, self._relative_turn_service_cb)
 
         self._tf_buffer = tf2_ros.Buffer()
         self._tf_listener = tf2_ros.TransformListener(self._tf_buffer)
@@ -43,6 +44,26 @@ class ConvenienceServer:
 
     def _robot_status_cb(self, msg: RobotStatus) -> None:
         self._latest_robot_status = msg
+
+    def _relative_turn_service_cb(self, msg: RelativeTurnService) -> RelativeTurnServiceResponse:
+        robot_transform = self._tf_buffer.lookup_transform(self._reference_frame, self._robot_frame, rospy.Time())
+        _, _, robot_yaw = euler_from_quaternion([robot_transform.transform.rotation.x, robot_transform.transform.rotation.y,
+                                                 robot_transform.transform.rotation.z, robot_transform.transform.rotation.w])
+
+        _, _, relative_yaw = euler_from_quaternion([msg.relative_rotation.x, msg.relative_rotation.y, msg.relative_rotation.z,
+                                                    msg.relative_rotation.w])
+
+        adjusted_quaternion = quaternion_from_euler(0.0, 0.0, robot_yaw + relative_yaw)
+
+        move_base_goal = MoveBaseGoal()
+        move_base_goal.target_pose = PoseStamped(Header(stamp=rospy.Time.now(), frame_id=self._reference_frame),
+                                                 Pose(Point(x=robot_transform.transform.translation.x,
+                                                            y=robot_transform.transform.translation.y,
+                                                            z=robot_transform.transform.translation.z),
+                                                      Quaternion(*adjusted_quaternion)))
+        self._move_base_client.send_goal(move_base_goal)
+
+        return RelativeTurnServiceResponse(success=True)
 
     def _goal_heading_service_cb(self, msg: GoalHeadingService) -> GoalHeadingServiceResponse:
         robot_transform = self._tf_buffer.lookup_transform(self._reference_frame, self._robot_frame, rospy.Time())

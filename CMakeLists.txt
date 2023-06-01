@@ -78,6 +78,7 @@ add_message_files(
 add_service_files(
   FILES
   GoalHeadingService.srv
+  RelativeTurnService.srv
   PatrolService.srv
   WaypointService.srv
 )
