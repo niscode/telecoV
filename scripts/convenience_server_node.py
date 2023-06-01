@@ -33,7 +33,7 @@ class ConvenienceServer:
         self._goal_heading_debug_publisher = rospy.Publisher('/convenience_server/debug/goal_heading', PoseStamped, queue_size=10)
         rospy.Subscriber('/robot_status/status', RobotStatus, self._robot_status_cb, queue_size=1)
         self._goal_heading_service = rospy.Service('/convenience_server/goal_heading', GoalHeadingService, self._goal_heading_service_cb)
-        self._goal_heading_service = rospy.Service('/convenience_server/relative_turn', RelativeTurnService, self._relative_turn_service_cb)
+        self._relative_turn_service = rospy.Service('/convenience_server/relative_turn', RelativeTurnService, self._relative_turn_service_cb)
 
         self._tf_buffer = tf2_ros.Buffer()
         self._tf_listener = tf2_ros.TransformListener(self._tf_buffer)
