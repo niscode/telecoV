@@ -162,11 +162,11 @@ This node collects information from several node and re-sends them in a custom m
 Uses: __robot_status.launch__
 
 #### Subscribed Topics
-move_base/status (GoalStatusArray)
+move_base/status (move_base_msgs::GoalStatusArray)
 
 &emsp;Listens to get the latest status of the navigation stack.
 
-move_base/goal (MoveBaseActionGoal)
+move_base/goal (move_base_msgs::MoveBaseActionGoal)
 
 &emsp;Listens to know the latest navigation goal.
 
@@ -199,7 +199,7 @@ robot_status/status (telecoV.msg::RobotStatus)
 &emsp;For future use.
 
 #### Published Topics
-convenience_server/debug/goal_heading (PoseStamped)
+convenience_server/debug/goal_heading (geometry_msgs::PoseStamped)
 
 &emsp;Publishes the requested heading for debug purposes.
 
