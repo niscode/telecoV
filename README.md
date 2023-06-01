@@ -53,7 +53,7 @@ created by ©︎niscode
     navigationなどのパッケージ実行中のみ、昇降が可能です。
 
 ## Additional Node Descriptions
-### waypoint_server_node.py
+### _waypoint_server_node.py_
 This node offers local waypoint setting, serializing, de-serializing and editing functions (CRUD). It publishes the most recent set of waypoints on the topic “/waypoint_server/waypoints” and uses InteractiveMarkers to allow easy editing of the waypoints with rviz. It offers its full functionality via an optional local CLI (check help command) and exposes basic functions through service calls.
 
 Uses: __waypoint_server.launch__
@@ -106,7 +106,7 @@ waypoint_server/cli (bool, default: "False")
 
 &emsp;Whether to spawn a command line in the console. If it is used it should be ended via the "quit" command before Ctrl-C kills the node.
 
-### patrol_node.py
+### _patrol_node.py_
 This node offers functionality to control patrolling over a given waypoint list.
 
 Uses: __patrol.launch__
@@ -138,7 +138,7 @@ waypoint_server/robot_frame (string, default: "base_link")
 
 &emsp;Robot frame the transform from the reference frame is used of.
 
-### safety_watchdog_simple.py
+### _safety_watchdog_simple.py_
 This node constantly monitors the LaserScan data published on “/scan” and if proximity falls short of threshold cancels the patrol and the current navigation so that the robot stops. The teleoperator has to make sure  the robot gets moved out of the obstacle and then can restart the patrol.
 
 #### Subscribed Topics
@@ -156,7 +156,7 @@ patrol/cancel (std_srvs::Empty)
 
 &emsp;In case of obstacle is detected closer than the proximity threshold calls to end current patrol.
 
-### robot_status_node.py
+### _robot_status_node.py_
 This node collects information from several node and re-sends them in a custom message as a central information point.
 
 Uses: __robot_status.launch__
@@ -188,7 +188,7 @@ waypoint_server/robot_frame (string, default: "base_link")
 
 &emsp;Robot frame the transform from the reference frame is used of.
 
-### conveniences_server_node.py
+### _conveniences_server_node.py_
 This node offers basic functions for the base, which can be used to support the interaction.
 
 Uses: __convenience_server.launch__
