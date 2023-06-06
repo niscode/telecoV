@@ -24,6 +24,9 @@ class ConvenienceServer:
     def __init__(self) -> None:
         rospy.init_node("convenience_server_node")
 
+        self._latest_robot_status = RobotStatus()
+        self._latest_waypoints = dict()
+
         self._reference_frame = rospy.get_param('/convenience_server/reference_frame', REFERENCE_FRAME)
         self._robot_frame = rospy.get_param('/convenience_server/robot_frame', ROBOT_FRAME)
 
@@ -41,9 +44,6 @@ class ConvenienceServer:
         self._tf_buffer = tf2_ros.Buffer()
         self._tf_listener = tf2_ros.TransformListener(self._tf_buffer)
 
-        self._latest_robot_status = RobotStatus()
-        self._requested_waypoints = dict()
-
         rospy.loginfo('Convenience_Server started')
 
     def _robot_status_cb(self, msg: RobotStatus) -> None:
@@ -53,7 +53,7 @@ class ConvenienceServer:
         latest_waypoints = dict()
         for w in msg.waypoints:
             latest_waypoints[w.label] = w.pose
-        self._received_waypoints = latest_waypoints
+        self._latest_waypoints = latest_waypoints
 
     def _relative_turn_service_cb(self, msg: RelativeTurnService) -> RelativeTurnServiceResponse:
         robot_transform = self._tf_buffer.lookup_transform(self._reference_frame, self._robot_frame, rospy.Time())
@@ -103,10 +103,10 @@ class ConvenienceServer:
         return GoalHeadingServiceResponse(goal_heading_quaternion)
 
     def _goal_heading_by_label_service_cb(self, msg: GoalHeadingByLabelService) -> GoalHeadingByLabelServiceResponse:
-        goal_heading_quaternion = Quaternion(0, 0, 0 ,0)
+        goal_heading_quaternion = Quaternion(0, 0, 0, 0)
         success = False
         try:
-            goal_pose = self._requested_waypoints[msg.goal_label]
+            goal_pose = self._latest_waypoints[msg.goal_label]
             robot_transform = self._tf_buffer.lookup_transform(self._reference_frame, self._robot_frame, rospy.Time())
 
             robot_vec = np.array([robot_transform.transform.translation.x,
