@@ -76,12 +76,27 @@ class ConvenienceServer:
         return RelativeTurnServiceResponse(success=True)
 
     def _goal_heading_service_cb(self, msg: GoalHeadingService) -> GoalHeadingServiceResponse:
+        return GoalHeadingServiceResponse(self._get_goal_heading(msg.goal_pose))
+
+    def _goal_heading_by_label_service_cb(self, msg: GoalHeadingByLabelService) -> GoalHeadingByLabelServiceResponse:
+        goal_heading_quaternion = Quaternion(0, 0, 0, 0)
+        success = False
+        try:
+            goal_pose = self._latest_waypoints[msg.goal_label]
+            goal_heading_quaternion = self._get_goal_heading(goal_pose)
+            success = True
+        except KeyError:
+            pass
+
+        return GoalHeadingByLabelServiceResponse(goal_heading=goal_heading_quaternion, success=success)
+
+    def _get_goal_heading(self, goal_pose: PoseStamped) -> Quaternion:
         robot_transform = self._tf_buffer.lookup_transform(self._reference_frame, self._robot_frame, rospy.Time())
 
         robot_vec = np.array([robot_transform.transform.translation.x,
                               robot_transform.transform.translation.y])
-        goal_vec = np.array([msg.goal_pose.pose.position.x,
-                             msg.goal_pose.pose.position.y])
+        goal_vec = np.array([goal_pose.pose.position.x,
+                             goal_pose.pose.position.y])
         difference_vec = goal_vec - robot_vec
 
         absolute_yaw = math.atan2(difference_vec[1], difference_vec[0])
@@ -100,41 +115,7 @@ class ConvenienceServer:
             debug_pose.pose.orientation = goal_heading_quaternion
             self._goal_heading_debug_publisher.publish(debug_pose)
 
-        return GoalHeadingServiceResponse(goal_heading_quaternion)
-
-    def _goal_heading_by_label_service_cb(self, msg: GoalHeadingByLabelService) -> GoalHeadingByLabelServiceResponse:
-        goal_heading_quaternion = Quaternion(0, 0, 0, 0)
-        success = False
-        try:
-            goal_pose = self._latest_waypoints[msg.goal_label]
-            robot_transform = self._tf_buffer.lookup_transform(self._reference_frame, self._robot_frame, rospy.Time())
-
-            robot_vec = np.array([robot_transform.transform.translation.x,
-                                  robot_transform.transform.translation.y])
-            goal_vec = np.array([goal_pose.pose.position.x,
-                                 goal_pose.pose.position.y])
-            difference_vec = goal_vec - robot_vec
-
-            absolute_yaw = math.atan2(difference_vec[1], difference_vec[0])
-
-            _, _, robot_yaw = euler_from_quaternion([robot_transform.transform.rotation.x, robot_transform.transform.rotation.y,
-                                                     robot_transform.transform.rotation.z, robot_transform.transform.rotation.w])
-
-            relative_yaw = absolute_yaw - robot_yaw
-            goal_heading_quaternion = Quaternion(*quaternion_from_euler(0.0, 0.0, relative_yaw))
-            success = True
-
-            if self._goal_heading_debug_publisher.get_num_connections() > 0:
-                debug_pose = PoseStamped()
-                debug_pose.header.stamp = rospy.Time.now()
-                debug_pose.header.frame_id = self._robot_frame
-                debug_pose.pose.position = Point()
-                debug_pose.pose.orientation = goal_heading_quaternion
-                self._goal_heading_debug_publisher.publish(debug_pose)
-        except KeyError:
-            pass
-
-        return GoalHeadingByLabelServiceResponse(goal_heading=goal_heading_quaternion, success=success)
+        return goal_heading_quaternion
 
     def run(self) -> None:
         rate = rospy.Rate(1)
