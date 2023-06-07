@@ -77,6 +77,9 @@ add_message_files(
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES
+  GoalHeadingService.srv
+  GoalHeadingByLabelService.srv
+  RelativeTurnService.srv
   PatrolService.srv
   WaypointService.srv
 )

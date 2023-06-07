@@ -1,0 +1,3 @@
+geometry_msgs/PoseStamped goal_pose
+---
+geometry_msgs/Quaternion goal_heading

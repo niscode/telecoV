@@ -42,7 +42,7 @@ class PatrolServer:
         self._patrol_cancel_service = rospy.Service('/patrol/cancel', Empty, self._service_cancel_cb)
         self._patrol_start_service = rospy.Service('/patrol/start', PatrolService, self._service_start_cb)
 
-        rospy.loginfo('PatrolServer started')
+        rospy.loginfo('Patrol_Server started')
 
     def _move_base_status_cb(self, msg: GoalStatusArray) -> None:
         if msg.status_list:
