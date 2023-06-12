@@ -34,7 +34,7 @@
   <include file="$(find telecoV)/launch/amcl_omni.launch"/>
  
    <!--- 経路計画，指令値生成ノード　move_base -->
-  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" args="/cmd_vel:=/rover_twist">
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" args="/cmd_vel:=/rover_twist_base">
     <rosparam file="$(find telecoV)/params/costmap_common_params.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find telecoV)/params/costmap_common_params.yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find telecoV)/params/local_costmap_params.yaml" command="load" />

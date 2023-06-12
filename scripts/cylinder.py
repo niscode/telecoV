@@ -92,7 +92,7 @@ if __name__ == '__main__':
 
     ## ROS設定
     rospy.init_node('cylinder')
-    pub = rospy.Publisher('rover_twist', Twist, queue_size=10)
+    pub = rospy.Publisher('rover_twist_cylinder', Twist, queue_size=10)
     pub_pos = rospy.Publisher('cylinder_now', Point, queue_size=10)
     sub = rospy.Subscriber("cylinder_pos", Point, pose_callback)
     rate = rospy.Rate(30)
