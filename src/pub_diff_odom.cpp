@@ -1,4 +1,5 @@
 #include <ros/ros.h>
+#include <ros/console.h>
 #include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/Twist.h>
@@ -15,6 +16,18 @@ double odom_kth = 1.0;
 int receive_flag = 0;
 
 void roverOdomCallback(const geometry_msgs::Twist::ConstPtr& rover_odom){
+  if(rover_odom->linear.x > 100 || rover_odom->linear.x < -100)
+  {
+    ROS_INFO("x-velocity excessive and ignored");
+    return;
+  }
+
+  if(rover_odom->angular.z > 100 || rover_odom->angular.z < -100)
+  {
+    ROS_INFO("rotational-velocity excessive and ignored");
+    return;
+  }
+
   vx = odom_kv * rover_odom->linear.x;
   vth = odom_kth * rover_odom->angular.z;
   receive_flag = 1;
