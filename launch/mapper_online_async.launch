@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+
+  <node pkg="telecoV" type="pub_diff_odom" name="pub_diff_odom" />
+  
+  <node pkg="slam_toolbox" type="sync_slam_toolbox_node" name="slam_toolbox" output="screen">
+    <rosparam command="load" file="$(find telecoV)/params/mapper_params_online_async.yaml" />
+  </node>
+
+</launch>
