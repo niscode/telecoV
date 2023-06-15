@@ -69,4 +69,7 @@
     <param name="range_min" value="0.56"/>
     <param name="range_max" value="25.0"/>
   </node>
+
+  <!-- muxer for twist messages designated for cylinder and base -->
+  <node name="cmd_vel_muxer_node" pkg="telecoV" type="cmd_vel_muxer_node.py" output="screen"/>
 </launch>

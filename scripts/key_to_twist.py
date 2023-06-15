@@ -49,7 +49,7 @@ if __name__ == '__main__':
     if stamped:
         TwistMsg = TwistStamped
 
-    twist_pub = rospy.Publisher('rover_twist', Twist, queue_size = 10)   #cmd_vel配信準備
+    twist_pub = rospy.Publisher('rover_twist_base', Twist, queue_size = 10)   #cmd_vel配信準備
 
     try:
         while(1):

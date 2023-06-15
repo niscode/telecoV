@@ -17,10 +17,10 @@
     <param name="kld_z" value="0.95"/>
     <!--  オドメトリモデルのパラメータ, odom_alpha1からodom_alpha4はノイズパラメータ  -->
     <param name="odom_model_type" value="diff"/>
-    <param name="odom_alpha1" value="0.1"/>
-    <param name="odom_alpha2" value="0.1"/>
-    <param name="odom_alpha3" value="0.1"/>
-    <param name="odom_alpha4" value="0.1"/>
+    <param name="odom_alpha1" value="0.8"/>
+    <param name="odom_alpha2" value="0.4"/>
+    <param name="odom_alpha3" value="0.4"/>
+    <param name="odom_alpha4" value="0.2"/>
     <param name="odom_frame_id" value="odom"/>
     <!-- レーザモデルのパラメータ -->
     <param name="base_frame_id" value="base_link" />
@@ -34,11 +34,11 @@
     <param name="laser_lambda_short" value="0.1"/>
     <!-- laser_model_type　には beam、 likelihood_field、 likelihood_field_prob からモデルを選択。基本的にlikelihood_fieldモデルを使用 -->
     <param name="laser_model_type" value="likelihood_field"/>
-    <param name="laser_likelihood_max_dist" value="2.0"/>
+    <param name="laser_likelihood_max_dist" value="7.0"/>
     <param name="update_min_d" value="0.2"/>
     <param name="update_min_a" value="0.2"/>
     <param name="resample_interval" value="1"/>
-    <param name="transform_tolerance" value="0.2"/>
+    <param name="transform_tolerance" value="0.3"/>
     <param name="recovery_alpha_slow" value="0.001"/>
     <param name="recovery_alpha_fast" value="0.01"/>
     <param name="use_map_topic" value="false" />

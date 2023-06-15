@@ -10,6 +10,7 @@
   <arg name="rover_type"        default="mega3"  doc="mega3 / outdoor" />
   <arg name="lrf"               default="s2"     doc="s2"/>
   <arg name="node_start_delay"  default="5.0" />
+  <arg name="start_rviz"        default="true" />
 
   <!-- bringup telecoV -->
   <include file="$(find telecoV)/launch/bringup_telecov.launch">
@@ -23,7 +24,7 @@
 
   <!-- mapサーバー -->
   <!--以下でマップファイルのパスの指定 -->
-  <arg name="map_file" default="$(find telecoV)/map/expo_1f.yaml"/>
+  <arg name="map_file" default="$(find telecoV)/map/expo_3f.yaml"/>
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
 
   <!-- 
@@ -34,7 +35,7 @@
   <include file="$(find telecoV)/launch/amcl_diff.launch"/>
  
   <!--- 経路計画，指令値生成ノード　move_base -->
-  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" args="/cmd_vel:=/rover_twist">
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" args="/cmd_vel:=/rover_twist_base">
     <rosparam file="$(find telecoV)/params/costmap_common_params.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find telecoV)/params/costmap_common_params.yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find telecoV)/params/local_costmap_params.yaml" command="load" />
@@ -48,5 +49,7 @@
   <node pkg="telecoV" type="pub_info" name="pub_info" />
   <!-- <node pkg="telecoV" type="multigoal_marker.py" name="multigoal_marker" /> -->
   <node pkg="robot_pose_publisher" type="robot_pose_publisher" name="robot_pose_publisher" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' "/>
-  <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rvizconfig)" />
+  <group if="$(arg start_rviz)">
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rvizconfig)" />
+  </group>
 </launch>
