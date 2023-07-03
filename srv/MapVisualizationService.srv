@@ -1,0 +1,8 @@
+bool draw_map_origin
+bool draw_waypoint_positions
+bool draw_robot_position
+---
+bool success
+sensor_msgs/Image visualization
+string[] labels
+geometry_msgs/Pose2D[] pixel_positions
