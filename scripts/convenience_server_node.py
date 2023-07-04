@@ -105,7 +105,6 @@ class ConvenienceServer:
 
     def _draw_arrow(self, image, origin_px: (int, int), position: (int, int), rotation: float, color: (int, int, int),
                     arrow_length: int = 20, thickness: int = 2, tip_length: float = 0.4) -> None:
-
         start_point = (origin_px[0] + position[0], origin_px[1] - position[1])
         rot_off = (int(math.cos(rotation) * arrow_length),int(math.sin(rotation) * arrow_length))
         end_point: (int, int) = (start_point[0] + rot_off[0], start_point[1] - rot_off[1])

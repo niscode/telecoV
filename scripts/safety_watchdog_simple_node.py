@@ -6,17 +6,17 @@ import rospy
 from std_srvs.srv import Empty
 from sensor_msgs.msg import LaserScan
 from actionlib_msgs.msg import GoalID, GoalStatusArray, GoalStatus
-from move_base_msgs.msg import MoveBaseActionGoal
+from dynamic_reconfigure.server import Server
+from telecoV.cfg import SafetyWatchdogConfig
+from telecoV.msg import StringArray
 from xmlrpc.client import ServerProxy as XMLServerProxy
 
 PROXIMITY_THRESHOLD = 0.5
-COOLDOWN_AFTER_TRIGGER = 5.0
-MAX_RETRIES = 5
 
 
 class SafetyWatchdog:
     def __init__(self) -> None:
-        rospy.init_node("safety_watchdog_simple_node")
+        rospy.init_node("safety_watchdog")
         self._ros_master = XMLServerProxy(os.environ['ROS_MASTER_URI'])
         self._rosnode_dynamically_loaded = __import__('rosnode')
 
@@ -27,13 +27,16 @@ class SafetyWatchdog:
         rospy.Subscriber('/scan', LaserScan, self._laser_scan_cb, queue_size=1)
         rospy.Subscriber('/move_base/status', GoalStatusArray, self._move_base_status_cb, queue_size=1)
         self._navigation_cancel_publisher = rospy.Publisher('/move_base/cancel', GoalID, queue_size=10)
+        self._robot_status_msg_publisher = rospy.Publisher('/robot_status/console_msg', StringArray, queue_size=10)
         self._patrol_cancel_service = rospy.ServiceProxy('/patrol/cancel', Empty)
 
         self._current_status = GoalStatus.SUCCEEDED
-        self._latest_goal = MoveBaseActionGoal()
         self._minimum_laser_range = -1.0
         self._current_retry = 1
         self._goal_header_id_during_incident = 0
+
+        self._proximity_threshold = PROXIMITY_THRESHOLD
+        self._dyn_rec_server = Server(SafetyWatchdogConfig, self._reconf_callback)
 
         rospy.loginfo('Safety_Watchdog started')
 
@@ -47,15 +50,16 @@ class SafetyWatchdog:
                 return False
         return False
 
+    def _reconf_callback(self, config, level):
+        self._proximity_threshold = float(config.proximity_threshold)
+        return config
+
     def _move_base_status_cb(self, msg: GoalStatusArray) -> None:
         if msg.status_list:
             self._current_status = msg.status_list[-1].status
 
     def _laser_scan_cb(self, msg: LaserScan) -> None:
         self._minimum_laser_range = min(msg.ranges)
-
-    def _move_base_goal_cb(self, msg: MoveBaseActionGoal) -> None:
-        self._latest_goal = msg
 
     def _cancel_navigation(self) -> None:
         rospy.loginfo(f'Obstacle appeared in a distance of {self._minimum_laser_range}... Canceling navigation...')
@@ -66,9 +70,13 @@ class SafetyWatchdog:
     def run(self) -> None:
         rate = rospy.Rate(10)
         while not rospy.is_shutdown():
-            if self._current_status == GoalStatus.ACTIVE and self._minimum_laser_range < PROXIMITY_THRESHOLD:
+            if self._current_status == GoalStatus.ACTIVE and self._minimum_laser_range < self._proximity_threshold:
                 self._patrol_cancel_service()
                 self._cancel_navigation()
+                console_msg = StringArray()
+                console_msg.data.append(f'物体は{self._proximity_threshold}メートルより近くに見えた。航行は中止された。')
+                console_msg.data.append(f'周囲を確認し、新しいナビゲーション・ゴールをリクエストしてください。')
+                self._robot_status_msg_publisher.publish(console_msg)
             rate.sleep()
 
 
