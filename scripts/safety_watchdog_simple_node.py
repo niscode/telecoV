@@ -74,8 +74,8 @@ class SafetyWatchdog:
                 self._patrol_cancel_service()
                 self._cancel_navigation()
                 console_msg = StringArray()
-                console_msg.data.append(f'物体は{self._proximity_threshold}メートルより近くに見えた。航行は中止された。')
-                console_msg.data.append(f'周囲を確認し、新しいナビゲーション・ゴールをリクエストしてください。')
+                console_msg.data.append(f'物体は{self._proximity_threshold}メートルの範囲に障害物を検知しました。ナビゲーションを終了します。')
+                console_msg.data.append(f'周囲を確認し、新しい地点を指定して,Goボタンを押してください。')
                 self._robot_status_msg_publisher.publish(console_msg)
             rate.sleep()
 
