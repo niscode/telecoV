@@ -4,15 +4,17 @@ import os
 import sys
 import math
 import rospy
+import actionlib
 from std_srvs.srv import Empty
 from std_msgs.msg import Float32, Header
 from sensor_msgs.msg import PointCloud2, PointField
+from geometry_msgs.msg import PolygonStamped, Polygon, Point
 import sensor_msgs.point_cloud2 as pc2
-from actionlib_msgs.msg import GoalID, GoalStatusArray, GoalStatus
+from actionlib_msgs.msg import GoalStatusArray, GoalStatus
 from dynamic_reconfigure.server import Server
 from telecoV.cfg import SafetyWatchdogConfig
 from telecoV.msg import StringArray
-from xmlrpc.client import ServerProxy as XMLServerProxy
+from move_base_msgs.msg import MoveBaseAction
 
 DEFAULT_ROBOT_RADIUS = 0.2
 PROXIMITY_THRESHOLD = 0.5
@@ -22,12 +24,10 @@ VOLTAGE_THRESHOLD = 20.5
 class SafetyWatchdog:
     def __init__(self) -> None:
         rospy.init_node("safety_watchdog")
-        self._ros_master = XMLServerProxy(os.environ['ROS_MASTER_URI'])
-        self._rosnode_dynamically_loaded = __import__('rosnode')
 
-        if not self._wait_for_node('/move_base', 10.0):
-            rospy.logerr('move_base node not available')
-            sys.exit(0)
+        rospy.loginfo('Waiting for move_base')
+        self._move_base_client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
+        self._move_base_client.wait_for_server()
 
         self._current_status = GoalStatus.SUCCEEDED
         self._minimum_laser_range = -1.0
@@ -44,25 +44,25 @@ class SafetyWatchdog:
         rospy.Subscriber('/voltage', Float32, self._voltage_cb, queue_size=1)
         rospy.Subscriber('/move_base/status', GoalStatusArray, self._move_base_status_cb, queue_size=1)
         self._laser_scan_debug_pub = rospy.Publisher('/safety_watchdog/laser_scan_debug', PointCloud2, queue_size=1)
-        self._navigation_cancel_publisher = rospy.Publisher('/move_base/cancel', GoalID, queue_size=10)
+        self._safety_perimeter_poly_pub = rospy.Publisher('/safety_watchdog/safety_perimeter', PolygonStamped, queue_size=1, latch=True)
         self._robot_status_msg_publisher = rospy.Publisher('/robot_status/console_msg', StringArray, queue_size=10)
         self._patrol_cancel_service = rospy.ServiceProxy('/patrol/cancel', Empty)
 
         rospy.loginfo('Safety_Watchdog started')
 
-    def _wait_for_node(self, node_name: str, timeout: float) -> bool:
-        start_time = rospy.Time.now().to_sec()
-        while start_time + timeout >= rospy.Time.now().to_sec():
-            try:
-                if node_name in self._rosnode_dynamically_loaded.get_node_names():
-                    return True
-            except self._rosnode_dynamically_loaded.ROSNodeIOException:
-                return False
-        return False
-
     def _reconf_callback(self, config, level):
         self._proximity_threshold = float(config.proximity_threshold)
         return config
+
+    def _publish_perimeter_poly(self) -> None:
+        msg = PolygonStamped()
+        msg.header = Header(stamp=rospy.Time.now(), frame_id='laser')
+        msg.polygon = Polygon()
+        msg.polygon.points.append(Point(x=0.0, y=self._robot_radius))
+        msg.polygon.points.append(Point(x=self._proximity_threshold + self._robot_radius, y=self._robot_radius))
+        msg.polygon.points.append(Point(x=self._proximity_threshold + self._robot_radius, y=-self._robot_radius))
+        msg.polygon.points.append(Point(x=0.0, y=-self._robot_radius))
+        self._safety_perimeter_poly_pub.publish(msg)
 
     def _move_base_status_cb(self, msg: GoalStatusArray) -> None:
         if msg.status_list:
@@ -107,9 +107,7 @@ class SafetyWatchdog:
 
     def _cancel_navigation(self):
         self._patrol_cancel_service()
-        empty_goal = GoalID()
-        for i in range(5):
-            self._navigation_cancel_publisher.publish(empty_goal)
+        self._move_base_client.cancel_all_goals()
 
     def _abort_conditions_met(self):
         return self._current_status == GoalStatus.ACTIVE and len(self._current_points_in_perimeter) > 0
@@ -117,6 +115,7 @@ class SafetyWatchdog:
     def run(self) -> None:
         rate = rospy.Rate(10)
         while not rospy.is_shutdown():
+            self._publish_perimeter_poly()
             if self._abort_conditions_met():
                 self._cancel_navigation()
                 self._warning_message()
