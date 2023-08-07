@@ -4,18 +4,13 @@ import csv
 from geometry_msgs.msg import PoseWithCovarianceStamped
 from visualization_msgs.msg import Marker
 from move_base_msgs.msg import MoveBaseActionGoal, MoveBaseGoal
+from telecoV.msg import WaypointArray
 
 # 初期位置
-initPose = [(-2.658176898956299,-1.5030968189239502,0.0),(0.0,0.0,0.6529810901764967,0.7573742112535348)]
+initPose = [(0.0,0.0,0.0),(0.0,0.0,0.0,1.0)]
 
 # 変数 [waypoints] にmulitgoal_getter.pyで取得したリストを格納
-waypoints = [
-[(-0.0856163501739502,-1.0303490161895752,0.0),(0.0,0.0,0.310046576055206,0.9507213685809546)],
-[(0.7238894701004028,1.3077094554901123,0.0),(0.0,0.0,0.8294782812788812,0.5585389698907617)],
-[(2.9680113792419434,3.5968070030212402,0.0),(0.0,0.0,-0.9948838474732121,0.10102539303016063)],
-[(4.735930442810059,-1.3344614505767822,0.0),(0.0,0.0,0.7088722662418192,0.7053368770688141)],
-[(-2.658176898956299,-1.5030968189239502,0.0),(0.0,0.0,0.6529810901764967,0.7573742112535348)],
-]
+waypoints = []
 
 def init_pose(pose): 
     pub_pose = rospy.Publisher('initialpose', PoseWithCovarianceStamped, queue_size=10)
@@ -44,21 +39,25 @@ def goal_pose(pose):
 
     return goal_pose
 
+def waypoint_cb(msg: WaypointArray) -> None:
+    global waypoints
+    waypoints = []
+    for w in msg.waypoints:
+        waypoints.append([(w.pose.pose.position.x,w.pose.pose.position.y,w.pose.pose.position.z),(w.pose.pose.orientation.x,w.pose.pose.orientation.y,w.pose.pose.orientation.z,w.pose.pose.orientation.w)])
 
 rospy.init_node("multigoal_marker")
 pub = rospy.Publisher("waypoint", Marker, queue_size = 10)
+rospy.Subscriber('/waypoint_server/waypoints', WaypointArray, waypoint_cb, queue_size=1)
 # rospy.Subscriber("/move_base/goal", MoveBaseActionGoal, goal_pose)    # 不要
 rate = rospy.Rate(1)
 
-
 if __name__ == '__main__':
     if not rospy.is_shutdown():
-        for i in range(2):
-            init_pose(initPose)
-            rospy.sleep(1)
+        # for i in range(2):
+        #     init_pose(initPose)
+        #    rospy.sleep(1)
         rospy.loginfo('Initialize position!')
         rospy.loginfo('Display Marker and Number!')
-
 
     while not rospy.is_shutdown():
         counter = 0
@@ -136,5 +135,3 @@ if __name__ == '__main__':
             counter +=1
 
         rate.sleep()
-
-    rospy.spin()
