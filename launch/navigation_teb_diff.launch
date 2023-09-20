@@ -24,8 +24,8 @@
 
   <!-- mapサーバー -->
   <!--以下でマップファイルのパスの指定 -->
-  <arg name="map_file" default="$(find telecoV)/map/atc_2f.yaml"/>
-  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+  <arg name="map_file" default="atr_1f.yaml"/>
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find telecoV)/map/$(arg map_file)" />
   
   <!-- 
     自己位置推定ノード amcl
