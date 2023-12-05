@@ -1,54 +1,60 @@
-# このパッケージの用途
+# SLAM / Navigation Stack for TELECO
 created by ©︎niscode
 
-ここではTeleco-V（台車）を使って、
-- gmappingを用いたSLAM や、
-- dwa（障害物回避）と自己位置推定（amcl）を用いたナビゲーション などを実行するためのlaunchファイルが格納されます。
+__Teleco-Vやペトラ台車__
+を使って、gmappingを用いたSLAM や、dwa（障害物回避）と自己位置推定（amcl）を用いたナビゲーション などを実行するためのlaunchファイルが格納されます。
+
+__For Teleco or Petra (vehicle part)__, 
+this repository contains launch files to execute SLAM using gmapping, navigation using dwa (obstacle avoidance) and self-position estimation (amcl), etc.
+
 <br>
 
-## [1/3] Ubuntu20.04 / ROS-noetic　環境を構築するための手順
-- `git clone git@github.com:niscode/scripts.git`
-- 上記のリポジトリをホームディレクトリに配置後、$ ./ros-noetic-setup.sh を実行。
-- 手順通りに進めると　$ roscore できるようになります。
+## [1/2] Build ROS-noetic (ROS1) in Ubuntu20.04
+- Refer this page: [telecoV/ROS 1/NUC_INSTALL.md](https://github.com/itb-atr/itb_manuals/blob/master/telecoV/ROS%201/NUC_INSTALL.md)
+- Click here to see the resources required to build ROS1 environment：
+    - [https://github.com/itb-atr/itb_manuals/tree/master/telecoV](https://github.com/itb-atr/itb_manuals/tree/master/telecoV)
+    - [https://github.com/itb-atr/itb_manuals/tree/master/telecoV/ROS%201](https://github.com/itb-atr/itb_manuals/tree/master/telecoV/ROS%201)
 <br>
 
-## [2/3] Ubuntu20.04 / ROS-noetic　環境で動作に必要なパッケージ群は以下の通りです。
-- `sudo apt -y install ros-noetic-rosserial`
+## [2/2] Necessary Packages for Ubuntu20.04 / ROS-noetic (ROS1)
+<!-- - `sudo apt -y install ros-noetic-rosserial`
 - `sudo apt -y install ros-noetic-slam-gmapping`
 - `sudo apt -y install ros-noetic-navigation`
 - `ros-noetic-map-server`
-- `ros-noetic-jsk-visualization`
-
-<br>
+- `ros-noetic-jsk-visualization` -->
 
 - `cd catkin_ws/src`
+- `git clone https://github.com/itb-atr/teleco_ros.git`
 - `git clone https://github.com/GT-RAIL/robot_pose_publisher.git`
 - `git clone https://github.com/rst-tu-dortmund/teb_local_planner.git`
-<br>
-
 - `cd catkin_ws`
 - `catkin_make`
-<br>
+- `source ~/.bashrc and .profile`
 
-## [3/3] USB接続されたデバイスファイル名の固定するための手順 （melodic/noetic共通）
+<!-- ## [3/3] USB接続されたデバイスファイル名の固定するための手順 （melodic/noetic共通）
 - `roscd telecoV/scripts`
 - `nano rplidar.rules`
 - 上記ファイルを編集して、対応するRPLiDARや台車のボードのシリアルNoを指定します。
 - `./create_udev_rules.sh`
-- `sudo reboot`
-<br>
+- `sudo reboot` -->
 
-### gmappingによる地図作成は以下のように実行します。
+### Making a map by gmapping with following command.
 - `roslaunch telecoV dual_gmapping.launch`
-### navigationによる自律移動は以下のように実行します。
+
+### Executing navigation with following command.
 - `roslaunch telecoV dual_naivation.launch`
 
-### cylinder昇降用スライダを表示するには以下を実行します。
+### Executing CAPF connection and launch all packages related to remote control.
+- `rosrun telecoV bringup_telecoV.sh`
+    - you can modify the detail here.
+    　~/catkin_ws/src/teleco_ros/scripts/bringup_telecoV.sh
+
+<!-- ### cylinder昇降用スライダを表示するには以下を実行します。
 - `rosrun telecoV cylinder.py`
 <br>![シリンダー上下用のスライダー](img/slider.png)
 - スライダーを上下に動かし、任意の位置で Update ボタンを押すことで動作します。
 - ※ `rosrun rosserial_python serial_node.py _port:=/dev/ROVER_BOARD _baud:=115200` が実行中か、
-    navigationなどのパッケージ実行中のみ、昇降が可能です。
+    navigationなどのパッケージ実行中のみ、昇降が可能です。 -->
 
 ## Additional Node Descriptions
 ### _waypoint_server_node.py_
