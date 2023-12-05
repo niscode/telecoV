@@ -22,10 +22,8 @@ created by ©︎niscode
 <br>
 
 - `cd catkin_ws/src`
-- `git clone https://github.com/niscode/telecoV.git`
-- `git clone https://github.com/Slamtec/rplidar_ros.git`
-- `git clone https://github.com/iralabdisco/ira_laser_tools.git`
 - `git clone https://github.com/GT-RAIL/robot_pose_publisher.git`
+- `git clone https://github.com/rst-tu-dortmund/teb_local_planner.git`
 <br>
 
 - `cd catkin_ws`

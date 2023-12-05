@@ -7,7 +7,7 @@
 -->
 
 <launch>
-  <arg name="rover_type"        default="mega3"  doc="mega3 / outdoor" />
+  <arg name="rover_type"        default="mega3"  doc="mega3 / petra / outdoor" />
   <arg name="lrf"               default="s2"     doc="s2"/>
   <arg name="node_start_delay"  default="5.0" />
   <arg name="start_rviz"        default="true" />
