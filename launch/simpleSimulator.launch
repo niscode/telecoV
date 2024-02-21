@@ -1,0 +1,7 @@
+<launch>
+    <arg name="map_file" default="atr_2fw.yaml"/>
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find telecoV)/map/$(arg map_file)" />
+
+    <!-- <node pkg="telecoV" type="pub_info" name="pub_info" /> -->
+    <node pkg="rviz" type="rviz" name="rviz" args="-d '$(find telecoV)/rviz/sim.rviz'" />
+</launch>

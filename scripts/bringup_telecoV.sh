@@ -8,7 +8,7 @@ tmux split-window -v
 tmux split-window -h
 tmux split-window -v
 tmux split-window -v
-tmux send-keys -t $session:$base_window_name.0 "roslaunch telecoV navigation_teb_diff.launch rover_type:=mega3 start_rviz:=false map_file:=atr_3f.yaml" Enter
+tmux send-keys -t $session:$base_window_name.0 "roslaunch telecoV navigation_teb_diff.launch rover_type:=mega3 start_rviz:=false map_file:=atr_2fw.yaml" Enter
 sleep 5
 tmux send-keys -t $session:$base_window_name.1 "roslaunch telecoV waypoint_server.launch cli:=$use_waypoint_server_cli" Enter
 tmux send-keys -t $session:$base_window_name.2 "roslaunch telecoV patrol.launch" Enter
