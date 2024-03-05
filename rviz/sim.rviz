@@ -286,6 +286,15 @@ Visualization Manager:
       top: 10
       update interval: 0.03999999910593033
       width: 128
+    - Class: rviz/InteractiveMarkers
+      Enable Transparency: true
+      Enabled: true
+      Name: InteractiveMarkers
+      Show Axes: false
+      Show Descriptions: true
+      Show Visual Aids: false
+      Update Topic: /waypoint_marker_handler/update
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -314,7 +323,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 12.550043106079102
+      Distance: 10.66231632232666
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -322,17 +331,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -1.182631015777588
-        Y: 0.23579154908657074
-        Z: 4.262556552886963
+        X: 2.3838717937469482
+        Y: 1.1288540363311768
+        Z: 3.187488317489624
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.5647963285446167
+      Pitch: 1.2797964811325073
       Target Frame: <Fixed Frame>
-      Yaw: 3.140401601791382
+      Yaw: 0.027238022536039352
     Saved:
       - Class: rviz/Orbit
         Distance: 10.296393394470215
@@ -371,4 +380,4 @@ Window Geometry:
     collapsed: false
   Width: 1510
   X: 354
-  Y: 35
+  Y: 27
