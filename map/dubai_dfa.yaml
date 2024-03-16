@@ -1,0 +1,7 @@
+image: dubai_dfa.pgm
+resolution: 0.050000
+origin: [-21.165306, -19.604092, 0.000000]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196
+
